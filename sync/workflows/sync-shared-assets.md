@@ -8,14 +8,13 @@ permissions:
   actions: read
   contents: read
   issues: read
-  pull-requests: read
 network:
   allowed:
     - defaults
     - github
 tools:
   github:
-    toolsets: [actions, issues, pull_requests, repos]
+    toolsets: [actions, issues, repos]
 engine:
   id: copilot
   steps:
@@ -25,17 +24,14 @@ engine:
         repository: nathlan/shared-assets
         token: ${{ secrets.GH_AW_AGENT_TOKEN }}
         path: source-repo
-    - name: Checkout current repo to sync to
-      uses: actions/checkout@v6
-      with:
-        path: target-repo
 safe-outputs:
   github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
-  create-pull-request:
+  create-issue:
+    assignees: [copilot]
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
-    draft: false
-    auto-merge: true
+    close-older-issues: true
+    max: 1
 ---
 
 # Sync Shared Assets from Source
@@ -47,31 +43,29 @@ This workflow synchronizes the contents of the `.github/` directory in this repo
 - **Source repo**: `nathlan/shared-assets`
 - **Source sync folder**: `source-repo/sync/` (checked out locally)
 - **Target repo**:  This repository where this workflow is running.
-- **Target sync folder**: `target-repo/.github/` (checked out locally)
+- **Target sync folder**: `.github/` (in the current directory)
 
 ## Tools
 
-- You also have the `safeoutputs` tool to create pull requests on the current repository.
+- You have access to `github` tools.
+- You have the `safeoutputs` tools to create issues on the current repository.
 
 ## Sync Process
 
 1) **Read Source**: Read the contents of the `source-repo/sync/` folder from the local filesystem.
-2) **Read Target**: Read the current contents of the `target-repo/.github/` folder from the local filesystem.
-3) **Compare**: Compare the source `source-repo/sync/` folder contents with the local `target-repo/.github/` contents:
+2) **Read Target**: Read the current contents of the `.github/` folder from the local filesystem.
+3) **Compare**: Compare the source `source-repo/sync/` folder contents with the local `.github/` contents:
 
-- Identify files that are missing in the local `target-repo/.github/` folder.
+- Identify files that are missing in the local `.github/` folder.
 - Identify files that have changed content compared to the source.
 - **Note**: This is a one way sync, we never sync changes back to the `source-repo/sync/` folder.
 
-4) **Update** Only if you've determined there are changes required in this repository:
+4) **Create Issue**: If you've determined there are changes required in this repository:
 
-- Create a branch following this pattern: `sync/shared-assets/<timestamp in DD-MM-YY format>`.
-- Only update local files that you've identfied need to be synced from the source `source-repo/sync/` folder.
-- You are allowed to overwrite per-line configuration in a local file already exists, as the configuration in the source `source-repo/sync/` folder takes precendence over local configuration.
-- Do not delete files in `target-repo/.github/` that do not exist in the source `source-repo/sync/` folder, as these are likely local configurations.
-
-5) **Create Pull Request**: If there are changes to sync from the `source-repo/sync/` folder:
-
-- Create a PR from the branch you created, targeting the default branch (`main`) of this repository.
-- The PR title should start with `[shared-assets-sync]`.
-- The PR body should detail the changes, listing added and updated files.
+- Create an issue in this repository using the `create-issue` safe output.
+- The issue should be assigned to `copilot`.
+- The issue title should start with `[shared-assets-sync]`.
+- The issue body must include:
+    - distinct steps for Copilot to perform the update.
+    - A list of files to add or update and the content that needs to be written to each file - be per-line specific and don't leave anything to the copilot cloud coding agent to determine itself.  
+    - Explicit instructions to the copilot agent to "create a PR that will auto-merge and isn't in draft mode, with the required changes.".
