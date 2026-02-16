@@ -68,6 +68,6 @@ You have access to `github` tools. The `repositories` configuration for the app 
 
 5) **Create Pull Request**: If there are changes to sync from the `sync/` folder in the `nathlan/shared-assets` repository:
 
-- Create a PR targeting the default branch of this repository.
+- Create a PR from the branch you created, targeting the default branch (`main`) of this repository.
 - The PR title should start with `[shared-assets-sync]`.
 - The PR body should detail the changes, listing added and updated files.
