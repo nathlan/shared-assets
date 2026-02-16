@@ -16,6 +16,7 @@ network:
     - github
 tools:
   github:
+    mode: remote
     toolsets: [repos]
     app:
       app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
