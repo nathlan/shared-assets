@@ -21,7 +21,7 @@
 #
 # Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 #
-# frontmatter-hash: 5aff6f0d8db8b780a8c042f85f4ecf4b920ee9c08b2eee3031cc26d7cd16d186
+# frontmatter-hash: 3d286532a3cb0f7c3c1ec299254337b0b74c247559efb31d12b06512fd670546
 
 name: "Sync Shared Assets to Template Repos"
 "on":
@@ -143,7 +143,7 @@ jobs:
         with:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
+          owner: nathlan
           repositories: ${{ github.event.repository.name }}
           github-api-url: ${{ github.api_url }}
           permission-contents: read
@@ -779,7 +779,7 @@ jobs:
         with:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
+          owner: nathlan
           repositories: ${{ github.event.repository.name }}
           github-api-url: ${{ github.api_url }}
           permission-contents: read
@@ -1045,7 +1045,7 @@ jobs:
         with:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
+          owner: nathlan
           repositories: ${{ github.event.repository.name }}
           github-api-url: ${{ github.api_url }}
           permission-contents: write
