@@ -15,14 +15,14 @@ tools:
     toolsets: [repos]
     mode: remote
     app:
-      app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
+      app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
       private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
       owner: nathlan
       repositories: [""]
   edit:
 safe-outputs:
   app:
-    app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
+    app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
     private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
     owner: nathlan
     repositories: [""]
