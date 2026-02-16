@@ -58,9 +58,6 @@ jobs:
       # REQUIRED: Working directory containing Terraform code
       working-directory: 'terraform'
 
-      # OPTIONAL: Override Terraform version if needed
-      terraform-version: 'latest'
-
       # OPTIONAL: Override Azure region if needed
       azure-region: 'australiaeast'
 
