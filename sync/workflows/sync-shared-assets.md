@@ -7,26 +7,20 @@ on:
 permissions:
   actions: read
   contents: read
-  issues: read
+  pull-requests: read
 network:
   allowed:
     - defaults
     - github
 tools:
   github:
-    toolsets: [actions, issues, repos]
-    app:
-      app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
-      private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-      owner: nathlan
-      repositories: [""]
+    toolsets: [actions, pull_requests, repos]
 safe-outputs:
-  create-issue:
-    assignees: [copilot]
+  create-pull-request:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
-    close-older-issues: true
-    max: 1
+    draft: false
+    auto-merge: true
 ---
 
 # Sync Shared Assets from Source
@@ -43,8 +37,7 @@ This is a one-way sync, from the remote `sync/` directory to this local reposito
 
 ## Tools
 
-- You have access to `github` tools and that grants you access to `nathlan/shared-assets`, allowing you to read its contents.
-- You also have the `safeoutputs` tool to create issues on the current repository.
+You have access to `github` tools. The `repositories` configuration for the app grants access to `nathlan/shared-assets`, allowing you to read its contents. You also have write access to the current repository to create pull requests.
 
 ## Sync Process
 
@@ -56,12 +49,15 @@ This is a one-way sync, from the remote `sync/` directory to this local reposito
 - Identify files that have changed content compared to the source.
 - **Note**: This is a one way sync, we never sync changes back to the `nathlan/shared-assets` repository.
 
-4) **Create Issue**: If you've determined there are changes required in this repository:
+4) **Update** Only if you've determined there are changes required in this repository:
 
-- Create an issue in this repository using the `create-issues` safe output.
-- The issue should be assigned to `copilot`.
-- The issue title should start with `[shared-assets-sync]`.
-- The issue body must include:
-    - distinct steps for Copilot to perform the update.
-    - A list of files to add or update and the content that needs to be written to each file - be per-line specific and don't leave anything to the copilot cloud coding agent to determine itself.  
-    - Explicit instructions to "Create an auto-merge Pull Request that isn't in draft mode with the required changes.".
+- Create a branch following this pattern: `sync/shared-assets/<timestamp in DD-MM-YY format>`.
+- Only update local files that you've identfied need to be synced from the source `sync/` folder. 
+- You are allowed to overwrite per-line configuration in a local file already exists, as the configuration in the source `sync/` folder takes precendence over local configuration.
+- Do not delete files in `.github/` that do not exist in the source `sync/` folder, as these are likely local configurations.
+
+5) **Create Pull Request**: If there are changes to sync from the `sync/` folder in the `nathlan/shared-assets` repository:
+
+- Create a PR from the branch you created, targeting the default branch (`main`) of this repository.
+- The PR title should start with `[shared-assets-sync]`.
+- The PR body should detail the changes, listing added and updated files.
