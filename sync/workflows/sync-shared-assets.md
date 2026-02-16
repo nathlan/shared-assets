@@ -9,8 +9,15 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+network:
+  allowed:
+    - defaults
+    - github
+tools:
+  github:
+    toolsets: [actions, issues, pull_requests, repos]
 engine:
-  id: custom
+  id: copilot
   steps:
     - name: Checkout source repo to sync from
       uses: actions/checkout@v6
