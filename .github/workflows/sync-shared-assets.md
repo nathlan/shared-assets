@@ -12,8 +12,8 @@ network:
     - github
 tools:
   github:
-    toolsets: [repos]
     mode: remote
+    toolsets: [repos]
     app:
       app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
       private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
@@ -46,7 +46,7 @@ This mirrors workflows, agents, issue templates, and other GitHub configurations
 
 ## Discovery and Sync Process
 
-1) Read all `*.tfvars` and `*.auto.tfvars` files under `nathlan/github-config/terraform/` (use the GitHub MCP server, not web search)
+1) Read all `*.tfvars` and `*.auto.tfvars` files under `nathlan/github-config/terraform/` only using the built-in GitHub tool [MCP server] (it's configured with a token that can access to read files from any repository under the nathlan organization). Use the `get_file_contents` tool with owner="nathlan" and repo="github-config" to read files from that repository.
 2) Parse `template_repositories` entries to build the target repo list
 3) For each discovered repository, read the current `.github/` folder structure
 4) For each discovered repository, sync changes from the `nathlan/shared-assets/sync/` folder into the `nathlan/<downstream-repo>/.github/` folder - these folders share the same structure. If a file to be synced contains repo-specific customizations then leave that configuration alone unless the sync is overwriting specific configuration. Don't delete additional repo-specific files added to the `nathlan/<downstream-repo>/.github/` folder.
