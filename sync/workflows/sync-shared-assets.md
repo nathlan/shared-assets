@@ -5,6 +5,7 @@ on:
   schedule: daily between 02:00 utc+12 and 03:00 utc+12 #  Using fuzzy schedule 'daily' instead to distribute workflow execution times. Will run between 3-4 AM during daylight savings
   workflow_dispatch: {}
 permissions:
+  actions: read
   contents: read
   pull-requests: read
 network:
@@ -13,13 +14,18 @@ network:
     - github
 tools:
   github:
-    toolsets: [repos, pull_requests]
+    toolsets: [actions, pull_requests, repos]
     app:
       app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
       private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
       owner: nathlan
       repositories: [""]
 safe-outputs:
+  app:
+    app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
+    private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
+    owner: nathlan
+    repositories: [""]
   create-pull-request:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
@@ -62,6 +68,6 @@ You have access to `github` tools. The `repositories` configuration for the app 
 
 5) **Create Pull Request**: If there are changes to sync from the `sync/` folder in the `nathlan/shared-assets` repository:
 
-- Create a PR targeting the default branch of this repository.
+- Create a PR from the branch you created, targeting the default branch (`main`) of this repository.
 - The PR title should start with `[shared-assets-sync]`.
 - The PR body should detail the changes, listing added and updated files.
