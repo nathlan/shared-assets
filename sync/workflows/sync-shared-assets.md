@@ -7,15 +7,23 @@ on:
 permissions:
   actions: read
   contents: read
+  issues: read
   pull-requests: read
-network:
-  allowed:
-    - defaults
-    - github
-tools:
-  github:
-    toolsets: [actions, pull_requests, repos]
+engine:
+  id: custom
+  steps:
+    - name: Checkout source repo to sync from
+      uses: actions/checkout@v6
+      with:
+        repository: nathlan/shared-assets
+        token: ${{ secrets.GH_AW_AGENT_TOKEN }}
+        path: source-repo
+    - name: Checkout current repo to sync to
+      uses: actions/checkout@v6
+      with:
+        path: target-repo
 safe-outputs:
+  github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
   create-pull-request:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
@@ -25,38 +33,37 @@ safe-outputs:
 
 # Sync Shared Assets from Source
 
-This workflow synchronizes the contents of the `.github/` directory in this repository with the `sync/` directory from the `nathlan/shared-assets` repository. It runs daily or can be triggered manually.'
-This is a one-way sync, from the remote `sync/` directory to this local repository.
+This workflow synchronizes the contents of the `.github/` directory in this repository with the `sync/` directory from the `nathlan/shared-assets` repository. It runs daily or can be triggered manually.' This is a one-way sync, from the remote `sync/` directory to this local repository.
 
 ## GitHub navigation guide
 
 - **Source repo**: `nathlan/shared-assets`
-- **Source sync folder**: `nathlan/shared-assets/sync/`
+- **Source sync folder**: `source-repo/sync/` (checked out locally)
 - **Target repo**:  This repository where this workflow is running.
-- **Target sync folder**: `.github/` in this repository.
+- **Target sync folder**: `target-repo/.github/` (checked out locally)
 
 ## Tools
 
-You have access to `github` tools. The `repositories` configuration for the app grants access to `nathlan/shared-assets`, allowing you to read its contents. You also have write access to the current repository to create pull requests.
+- You also have the `safeoutputs` tool to create pull requests on the current repository.
 
 ## Sync Process
 
-1) **Read Source**: distinct from the local repository, read the contents of the `sync/` folder in the `nathlan/shared-assets` repository using the `github` tools.
-2) **Read Target**: Read the current contents of the `.github/` folder in this repository.
-3) **Compare**: Compare the source `sync/` folder contents with the local `.github/` contents:
+1) **Read Source**: Read the contents of the `source-repo/sync/` folder from the local filesystem.
+2) **Read Target**: Read the current contents of the `target-repo/.github/` folder from the local filesystem.
+3) **Compare**: Compare the source `source-repo/sync/` folder contents with the local `target-repo/.github/` contents:
 
-- Identify files that are missing in the local `.github/` folder.
+- Identify files that are missing in the local `target-repo/.github/` folder.
 - Identify files that have changed content compared to the source.
-- **Note**: This is a one way sync, we never sync changes back to the `nathlan/shared-assets` repository.
+- **Note**: This is a one way sync, we never sync changes back to the `source-repo/sync/` folder.
 
 4) **Update** Only if you've determined there are changes required in this repository:
 
 - Create a branch following this pattern: `sync/shared-assets/<timestamp in DD-MM-YY format>`.
-- Only update local files that you've identfied need to be synced from the source `sync/` folder. 
-- You are allowed to overwrite per-line configuration in a local file already exists, as the configuration in the source `sync/` folder takes precendence over local configuration.
-- Do not delete files in `.github/` that do not exist in the source `sync/` folder, as these are likely local configurations.
+- Only update local files that you've identfied need to be synced from the source `source-repo/sync/` folder.
+- You are allowed to overwrite per-line configuration in a local file already exists, as the configuration in the source `source-repo/sync/` folder takes precendence over local configuration.
+- Do not delete files in `target-repo/.github/` that do not exist in the source `source-repo/sync/` folder, as these are likely local configurations.
 
-5) **Create Pull Request**: If there are changes to sync from the `sync/` folder in the `nathlan/shared-assets` repository:
+5) **Create Pull Request**: If there are changes to sync from the `source-repo/sync/` folder:
 
 - Create a PR from the branch you created, targeting the default branch (`main`) of this repository.
 - The PR title should start with `[shared-assets-sync]`.
