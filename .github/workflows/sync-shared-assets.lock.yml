@@ -21,7 +21,7 @@
 #
 # Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 #
-# frontmatter-hash: 3d286532a3cb0f7c3c1ec299254337b0b74c247559efb31d12b06512fd670546
+# frontmatter-hash: 3125544b6238e4c16e97640db40cd03ba577d0f1c137488c73db3c070118b5c7
 
 name: "Sync Shared Assets to Template Repos"
 "on":
@@ -144,7 +144,7 @@ jobs:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
-          repositories: ${{ github.event.repository.name }}
+          repositories: 
           github-api-url: ${{ github.api_url }}
           permission-contents: read
       - name: Download container images
@@ -780,7 +780,7 @@ jobs:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
-          repositories: ${{ github.event.repository.name }}
+          repositories: 
           github-api-url: ${{ github.api_url }}
           permission-contents: read
           permission-discussions: write
@@ -1046,7 +1046,7 @@ jobs:
           app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
-          repositories: ${{ github.event.repository.name }}
+          repositories: 
           github-api-url: ${{ github.api_url }}
           permission-contents: write
           permission-issues: write
