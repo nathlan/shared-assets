@@ -66,6 +66,7 @@ This workflow synchronizes the contents of the `.github/` directory in this repo
 - The issue should be assigned to `copilot`.
 - The issue title should start with `[shared-assets-sync]`.
 - The issue body must include:
-    - distinct steps for Copilot to perform the update.
-    - A list of files to add or update and the content that needs to be written to each file - be per-line specific and don't leave anything to the copilot cloud coding agent to determine itself.  
-    - Explicit instructions to the copilot agent to "create a PR that will auto-merge and isn't in draft mode, with the required changes.".
+  - A distinct steps for Copilot to perform the update i.e. a list of files to add or update and the content that needs to be written to each file - be per-line specific and don't leave anything to the copilot cloud coding agent to determine itself.  
+  - Explicit instructions to the copilot agent to:
+    - The PR title should start with `[shared-assets-sync] `
+    - The PR should have the same labels as the issue i.e. `[agentic-workflow, shared-assets-sync, platform-engineering]`
