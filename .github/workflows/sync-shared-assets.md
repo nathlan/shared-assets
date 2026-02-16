@@ -3,13 +3,13 @@ name: Sync Shared Assets to Template Repos
 description: Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
-      - sync/**
+      - 'sync/**'
   workflow_dispatch: {}
 permissions:
   contents: read
+  actions: read
 network:
   allowed:
     - defaults
@@ -18,6 +18,8 @@ tools:
   github:
     toolsets: [repos]
   edit:
+  bash:
+    - "git:*"
 safe-outputs:
   app:
     app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
