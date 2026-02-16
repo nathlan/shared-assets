@@ -1,2 +1,0 @@
-# Protect sync-shared-assets workflow files
-.github/workflows/sync-shared-assets.* @nathlan/platform-engineering

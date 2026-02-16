@@ -21,7 +21,7 @@
 #
 # Sync content from the `nathlan/shared-assets/sync/` directory to the `.github/` directory in this repository.
 #
-# frontmatter-hash: ddcee12c8c3e0d076439061d88c8bae0e311b95e81a0b78aca7834ae6360f8e6
+# frontmatter-hash: 57c32c40010593f7d8c35c6b6627cbe11aae9d03f02fd32c81a9f14c33eb5b34
 
 name: "Sync Shared Assets"
 "on":
@@ -779,9 +779,10 @@ jobs:
           app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
-          repositories: 
+          repositories: ${{ github.event.repository.name }}
           github-api-url: ${{ github.api_url }}
           permission-contents: read
+          permission-discussions: write
           permission-issues: write
           permission-pull-requests: write
       - name: Debug job inputs
@@ -1044,7 +1045,7 @@ jobs:
           app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
-          repositories: 
+          repositories: ${{ github.event.repository.name }}
           github-api-url: ${{ github.api_url }}
           permission-contents: write
           permission-issues: write
