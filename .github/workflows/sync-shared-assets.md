@@ -17,7 +17,6 @@ network:
     - github
 tools:
   github:
-    mode: remote
     toolsets: [actions, pull_requests, repos]
     app:
       app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
@@ -37,6 +36,7 @@ safe-outputs:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
     draft: false
+    auto-merge: true
 ---
 
 # Sync Shared Assets to Template Repos
