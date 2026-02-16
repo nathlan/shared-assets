@@ -17,6 +17,11 @@ network:
 tools:
   github:
     toolsets: [repos]
+    app:
+      app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
+      private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
+      owner: nathlan
+      repositories: [""]
   edit:
   bash:
     - "git:*"
@@ -45,8 +50,15 @@ This mirrors workflows, agents, issue templates, and other GitHub configurations
 
 ## Discovery and Sync Process
 
-1) Read all `*.tfvars` and `*.auto.tfvars` files in `nathlan/github-config/terraform/` directory. Parse `template_repositories` entries to build the list of target repositories that were created from the template.
+1) Read all `*.tfvars` and `*.auto.tfvars` files in `nathlan/github-config/terraform/` directory. Parse `template_repositories` entries to build the list of target repositories that were created from the template:
+```
+template_repositories = [
+  {
+    name = "<downstream-repo-name-here>"
+  }
+]
+```
 2) For each discovered repository, read the current `.github/` folder structure to understand the existing configuration
 3) Compare the source `sync/` folder contents with the current `.github/` in each target repo
-4) For each discovered repository, sync changes from `nathlan/shared-assets/sync/` to `nathlan/<downstream-repo>/.github/`. Preserve repo-specific customizations - don't overwrite configs that differ from source unless explicitly syncing that file. Don't delete additional files that exist in target `.github/` but not in source.
-5) Create pull requests in each target repository with detailed change summary, compatibility notes, and links to source commits
+4) For each discovered repository, determine the changes to sync from `nathlan/shared-assets/sync/` to `nathlan/<downstream-repo>/.github/`. Preserve repo-specific customizations - don't overwrite configs that differ from source unless explicitly syncing that file. Don't delete additional files that exist in target `.github/` but not in source.
+5) Use `safe_outputs` to create pull requests in each target repository with detailed change summary, compatibility notes, and links to source commits.
