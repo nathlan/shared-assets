@@ -2,7 +2,11 @@
 name: Sync Shared Assets to Template Repos
 description: Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 on:
-  schedule: weekly on Sunday around 02:00 utc+12 # 2AM NZST, 3AM NZDT
+  push:
+    branches:
+      - main
+    paths:
+      - sync/**
   workflow_dispatch: {}
 permissions:
   contents: read
@@ -12,13 +16,7 @@ network:
     - github
 tools:
   github:
-    mode: remote
     toolsets: [repos]
-    app:
-      app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
-      private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-      owner: nathlan
-      repositories: [""]
   edit:
 safe-outputs:
   app:
@@ -30,7 +28,6 @@ safe-outputs:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
     draft: false
-    auto-merge: true
 ---
 
 # Sync Shared Assets to Template Repos
@@ -46,9 +43,8 @@ This mirrors workflows, agents, issue templates, and other GitHub configurations
 
 ## Discovery and Sync Process
 
-1) Read all `*.tfvars` and `*.auto.tfvars` files under `nathlan/github-config/terraform/` only using the built-in GitHub tool [MCP server] (it's configured with a token that can access to read files from any repository under the nathlan organization). Use the `get_file_contents` tool with owner="nathlan" and repo="github-config" to read files from that repository.
-2) Parse `template_repositories` entries to build the target repo list
-3) For each discovered repository, read the current `.github/` folder structure
-4) For each discovered repository, sync changes from the `nathlan/shared-assets/sync/` folder into the `nathlan/<downstream-repo>/.github/` folder - these folders share the same structure. If a file to be synced contains repo-specific customizations then leave that configuration alone unless the sync is overwriting specific configuration. Don't delete additional repo-specific files added to the `nathlan/<downstream-repo>/.github/` folder.
-5) Create a pull request with detailed change summary, compatibility notes, and links to source commits
-6) If auto-merge is enabled in the repo, note that the PR should merge automatically after required checks and approvals complete; otherwise, leave it for manual review
+1) Read all `*.tfvars` and `*.auto.tfvars` files in `nathlan/github-config/terraform/` directory. Parse `template_repositories` entries to build the list of target repositories that were created from the template.
+2) For each discovered repository, read the current `.github/` folder structure to understand the existing configuration
+3) Compare the source `sync/` folder contents with the current `.github/` in each target repo
+4) For each discovered repository, sync changes from `nathlan/shared-assets/sync/` to `nathlan/<downstream-repo>/.github/`. Preserve repo-specific customizations - don't overwrite configs that differ from source unless explicitly syncing that file. Don't delete additional files that exist in target `.github/` but not in source.
+5) Create pull requests in each target repository with detailed change summary, compatibility notes, and links to source commits
