@@ -17,13 +17,11 @@ tools:
     app:
       app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
       private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-      owner: nathlan
   edit:
 safe-outputs:
   app:
     app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
     private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-    owner: nathlan
   create-pull-request:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
