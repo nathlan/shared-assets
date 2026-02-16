@@ -21,10 +21,6 @@ tools:
       owner: nathlan
       repositories: [""]
 safe-outputs:
-  app:
-    app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
-    private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-    owner: nathlan
   create-issue:
     assignees: [copilot]
     title-prefix: "[shared-assets-sync] "
