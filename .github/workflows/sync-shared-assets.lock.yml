@@ -21,7 +21,7 @@
 #
 # Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 #
-# frontmatter-hash: 3d51d8ed9e2a263b462a775cc18f94e48064c98508c7c45424eac606cb02472c
+# frontmatter-hash: 9d5826d8886d96a054e30a30393becf8a799d4f2efb366dfc3e074c5fb31f692
 
 name: "Sync Shared Assets to Template Repos"
 "on":
@@ -141,7 +141,7 @@ jobs:
         id: github-mcp-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
@@ -776,7 +776,7 @@ jobs:
         id: safe-outputs-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
@@ -1042,7 +1042,7 @@ jobs:
         id: safe-outputs-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
