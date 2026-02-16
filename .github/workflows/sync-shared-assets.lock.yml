@@ -21,7 +21,7 @@
 #
 # Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 #
-# frontmatter-hash: 3125544b6238e4c16e97640db40cd03ba577d0f1c137488c73db3c070118b5c7
+# frontmatter-hash: 3d51d8ed9e2a263b462a775cc18f94e48064c98508c7c45424eac606cb02472c
 
 name: "Sync Shared Assets to Template Repos"
 "on":
@@ -141,7 +141,7 @@ jobs:
         id: github-mcp-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
@@ -650,12 +650,11 @@ jobs:
             const { main } = require('/opt/gh-aw/actions/redact_secrets.cjs');
             await main();
         env:
-          GH_AW_SECRET_NAMES: 'COPILOT_GITHUB_TOKEN,GH_AW_GITHUB_MCP_SERVER_TOKEN,GH_AW_GITHUB_TOKEN,GITHUB_TOKEN,SOURCE_REPO_SYNC_APP_ID,SOURCE_REPO_SYNC_APP_PRIVATE_KEY'
+          GH_AW_SECRET_NAMES: 'COPILOT_GITHUB_TOKEN,GH_AW_GITHUB_MCP_SERVER_TOKEN,GH_AW_GITHUB_TOKEN,GITHUB_TOKEN,SOURCE_REPO_SYNC_APP_PRIVATE_KEY'
           SECRET_COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
           SECRET_GH_AW_GITHUB_MCP_SERVER_TOKEN: ${{ secrets.GH_AW_GITHUB_MCP_SERVER_TOKEN }}
           SECRET_GH_AW_GITHUB_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN }}
           SECRET_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SECRET_SOURCE_REPO_SYNC_APP_ID: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
           SECRET_SOURCE_REPO_SYNC_APP_PRIVATE_KEY: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
       - name: Upload Safe Outputs
         if: always()
@@ -777,7 +776,7 @@ jobs:
         id: safe-outputs-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
@@ -1043,7 +1042,7 @@ jobs:
         id: safe-outputs-app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app-id: ${{ secrets.SOURCE_REPO_SYNC_APP_ID }}
+          app-id: ${{ var.SOURCE_REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
           owner: nathlan
           repositories: 
