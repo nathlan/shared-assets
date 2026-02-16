@@ -21,7 +21,7 @@
 #
 # Sync the sync/ folder to .github/ in all repositories created from nathlan/alz-workload-template
 #
-# frontmatter-hash: b2fe229dd6e71aa732ff3d6f671d87cdb082b56201bb3bb4a54ea215030b3928
+# frontmatter-hash: 180fe741812f520f71052ee68f12bbc3f5249948dd0239660fbe5482db20b6b3
 
 name: "Sync Shared Assets to Template Repos"
 "on":
@@ -406,7 +406,7 @@ jobs:
                   "GITHUB_LOCKDOWN_MODE": "$GITHUB_MCP_LOCKDOWN",
                   "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_MCP_SERVER_TOKEN}",
                   "GITHUB_READ_ONLY": "1",
-                  "GITHUB_TOOLSETS": "actions,pull_requests,repos"
+                  "GITHUB_TOOLSETS": "repos,pull_requests,actions"
                 }
               },
               "safeoutputs": {
