@@ -8,16 +8,16 @@ on:
       - 'sync/**'
   workflow_dispatch: {}
 permissions:
+  actions: read
   contents: read
   pull-requests: read
-  actions: read
 network:
   allowed:
     - defaults
     - github
 tools:
   github:
-    toolsets: [actions, pull_requests, repos]
+    toolsets: [repos, pull_requests, actions]
     app:
       app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
       private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
@@ -28,10 +28,10 @@ tools:
     - "git:*"
 safe-outputs:
   app:
-    app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
-    private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
-    owner: nathlan
-    repositories: [""]
+      app-id: ${{ vars.SOURCE_REPO_SYNC_APP_ID }}
+      private-key: ${{ secrets.SOURCE_REPO_SYNC_APP_PRIVATE_KEY }}
+      owner: nathlan
+      repositories: [""]
   create-pull-request:
     title-prefix: "[shared-assets-sync] "
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
@@ -41,22 +41,24 @@ safe-outputs:
 
 # Sync Shared Assets to Template Repos
 
-When the `sync/` folder changes in this repository, synchronize its contents to all repositories created from the `nathlan/alz-workload-template` template. The sync folder structure maps to `.github/` in downstream repos, allowing workflow, agent, and template updates to propagate automatically.
+When the `sync/` folder changes in this repository, synchronize its contents to all repositories created from a template repo. The `sync/` directorty structure maps to `.github/` in downstream repos, allowing workflow, agent, and template updates to propagate automatically.
 
-## Sync Mapping
+## GitHub navigation guide
 
-- **Source**: `nathlan/shared-assets/sync/`
-- **Target**: `nathlan/<downstream-repo>/.github/`
+- **This repo**: `nathlan/shared-assets/sync/`
+- **Terraform configuration**: `nathlan/github-config/terraform/*.tfvars`
+- **Source sync folder**: `nathlan/shared-assets/sync/`
+- **Target sync folder**: `nathlan/<downstream-repo>/.github/`
 
 This mirrors workflows, agents, issue templates, and other GitHub configurations across all infrastructure repositories.
 
 ## Tools
 
-You must use the `github` MCP server and all the tools available to you to read contents and/or create PRs in remote repos
+The `gh` CLI isn't available to you. You must use the `github` tools available to you to read contents and/or create PRs in remote repos.
 
 ## Discovery and Sync Process
 
-1) Read all `*.tfvars` and `*.auto.tfvars` files in `nathlan/github-config/terraform/` directory. Parse `template_repositories` entries to build the list of target repositories that were created from the template:
+1) Read all `*.tfvars` and `*.auto.tfvars` files in `nathlan/github-config/terraform/` directory. Parse `template_repositories` entries within the `.tfvars` files to build the list of target repositories that were created from the template repo:
 ```
 template_repositories = [
   {
