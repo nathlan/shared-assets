@@ -14,6 +14,7 @@ network:
     - github
 tools:
   github:
+    github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
     toolsets: [issues, repos]
 engine:
   id: copilot
