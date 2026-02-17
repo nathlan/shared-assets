@@ -1,0 +1,30 @@
+{
+  "name": "GitHub Agentic Workflows Development",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "redhat.vscode-yaml",
+        "DavidAnson.vscode-markdownlint",
+        "github.vscode-github-actions",
+        "GitHub.vscode-pull-request-github",
+        "michelemelluso.gitignore"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+    },
+    "ghcr.io/devcontainers/features/copilot-cli:1": {
+
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "remoteUser": "vscode",
+  "postAttachCommand": "bash .devcontainer/gh-aw.sh"
+}
