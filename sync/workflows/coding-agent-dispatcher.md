@@ -94,10 +94,10 @@ These tools are injected by the safe-outputs runtime. They are the ONLY way to p
 
 Use the following deterministic mapping. Each label corresponds to exactly one custom agent name:
 
-| Issue Label       | Agent Name       | Repository Context           | Description                                          |
-|-------------------|------------------|------------------------------|------------------------------------------------------|
-| `alz-vending`     | `alz-vending`    | `nathlan/alz-subscriptions`  | Azure Landing Zone provisioning agent                |
-| `github-config`   | `github-config`  | `nathlan/github-config`      | GitHub configuration management agent                |
+| Issue Label     | Agent Name                   | Repository Context          | Description                                       |
+|-----------------|------------------------------|-----------------------------|---------------------------------------------------|
+| `alz-vending`   | `ALZ Subscription Vending`   | `nathlan/alz-subscriptions` | Azure Landing Zone provisioning via Terraform     |
+| `github-config` | `GitHub Configuration Agent` | `nathlan/github-config`     | Manages GitHub Configuration via Terraform        |
 
 **The label must be an exact match.** Only labels listed in the routing table above should trigger any action.
 
