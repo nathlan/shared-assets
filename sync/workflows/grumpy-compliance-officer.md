@@ -17,13 +17,13 @@ tools:
     toolsets: [pull_requests, repos]
 engine:
   id: copilot
-  steps:
-    - name: Checkout source repo to sync from
-      uses: actions/checkout@v6
-      with:
-        repository: nathlan/shared-standards
-        token: ${{ secrets.GH_AW_AGENT_TOKEN }}
-        path: shared-standards
+steps:
+  - name: Checkout source repo to sync from
+    uses: actions/checkout@v6
+    with:
+      repository: nathlan/shared-standards
+      token: ${{ secrets.GH_AW_AGENT_TOKEN }}
+      path: shared-standards
 safe-outputs:
   github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
   create-pull-request-review-comment:

@@ -23,7 +23,7 @@
 #
 # Compliance officer that validates code against organisation shared standards, stored in the nathlan/shared-standards repository
 #
-# frontmatter-hash: 56452359a51368578a6679d11be199820c03d52eab40c2a1520addf7ba4b5d95
+# frontmatter-hash: 5c0c7af9c77ee71189c126bde62488bd5bce2904f192a8f35d8fa1468a108f23
 
 name: "Grumply Compliance Checker"
 "on":
@@ -260,12 +260,15 @@ jobs:
         uses: github/gh-aw/actions/setup@de12ba797dda93d15a84e32976c64b0c45ab27c8 # v0.45.3
         with:
           destination: /opt/gh-aw/actions
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
       - name: Create gh-aw temp directory
         run: bash /opt/gh-aw/actions/create_gh_aw_tmp_dir.sh
+      - name: Checkout source repo to sync from
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          path: shared-standards
+          repository: nathlan/shared-standards
+          token: ${{ secrets.GH_AW_AGENT_TOKEN }}
+
       # Cache memory file share configuration from frontmatter processed below
       - name: Create cache-memory directory
         run: bash /opt/gh-aw/actions/create_cache_memory_dir.sh
@@ -763,13 +766,6 @@ jobs:
           path: /tmp/gh-aw/aw-prompts
       - name: Clean git credentials
         run: bash /opt/gh-aw/actions/clean_git_credentials.sh
-      - name: Checkout source repo to sync from
-        uses: actions/checkout@v6
-        with:
-          path: shared-standards
-          repository: nathlan/shared-standards
-          token: ${{ secrets.GH_AW_AGENT_TOKEN }}
-
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
@@ -1085,13 +1081,6 @@ jobs:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
       - name: Install GitHub Copilot CLI
         run: /opt/gh-aw/actions/install_copilot_cli.sh 0.0.410
-      - name: Checkout source repo to sync from
-        uses: actions/checkout@v6
-        with:
-          path: shared-standards
-          repository: nathlan/shared-standards
-          token: ${{ secrets.GH_AW_AGENT_TOKEN }}
-
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
