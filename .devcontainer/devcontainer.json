@@ -1,6 +1,6 @@
 {
-  "name": "GitHub Agentic Workflows Development",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "name": "Agentic Workflows Development",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,6 +12,20 @@
         "GitHub.vscode-pull-request-github",
         "michelemelluso.gitignore"
       ]
+    },
+    "codespaces": {
+      "repositories": {
+        "nathlan/shared-assets": {
+          "permissions": {
+            "actions": "write",
+            "contents": "write",
+            "discussions": "read",
+            "issues": "read",
+            "pull-requests": "write",
+            "workflows": "write"
+          }
+        }
+      }
     }
   },
   "features": {
@@ -20,11 +34,9 @@
     "ghcr.io/devcontainers/features/github-cli:1": {
     },
     "ghcr.io/devcontainers/features/copilot-cli:1": {
-
     },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-  "remoteUser": "vscode",
-  "postAttachCommand": "bash .devcontainer/gh-aw.sh"
+  "postCreateCommand": "curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash",
+  "postAttachCommand": "bash .devcontainer/gh-aw-login.sh"
 }
