@@ -23,7 +23,7 @@
 #
 # Assigns the github-config custom Copilot coding agent to issues and notifies requesters on completion.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"a6a5ddaa42a0abc87b377d781eb03cd3a09ac4a5bbf827e3e52a5298fe2b4163"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"79e767eaa6a5c3b0a8c52591f28115f96145f7458df22033a73055bf62acd151"}
 
 name: "GitHub Config Dispatcher"
 "on":
@@ -1109,7 +1109,6 @@ jobs:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
           GH_AW_AGENT_MAX_COUNT: 1
           GH_AW_AGENT_DEFAULT: "copilot"
-          GH_AW_AGENT_DEFAULT_MODEL: "gpt-5.2-codex"
           GH_AW_AGENT_DEFAULT_CUSTOM_AGENT: "github-config"
           GH_AW_AGENT_TARGET: "triggering"
         with:

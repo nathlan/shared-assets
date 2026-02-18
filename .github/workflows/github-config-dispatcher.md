@@ -23,7 +23,6 @@ safe-outputs:
   assign-to-agent:
     name: "copilot"
     custom-agent: "github-config"
-    model: "gpt-5.2-codex"
     target: "triggering"
     max: 1
   add-comment:

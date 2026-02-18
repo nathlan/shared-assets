@@ -23,7 +23,7 @@
 #
 # Assigns the alz-vending custom Copilot coding agent to issues and orchestrates cross-repo handoff on close.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"fc10a788822e3f96d3323618f544f42c7adf3fb448d5422aaf6e5d02dca4d825"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"97c13527e7fcdd5261481f254825335e6ae8045dbd9e78a4e8fddac2e9fcaeb0"}
 
 name: "ALZ Vending Dispatcher"
 "on":
@@ -1183,7 +1183,6 @@ jobs:
           GH_AW_AGENT_OUTPUT: ${{ env.GH_AW_AGENT_OUTPUT }}
           GH_AW_AGENT_MAX_COUNT: 1
           GH_AW_AGENT_DEFAULT: "copilot"
-          GH_AW_AGENT_DEFAULT_MODEL: "gpt-5.2-codex"
           GH_AW_AGENT_DEFAULT_CUSTOM_AGENT: "alz-vending"
           GH_AW_AGENT_TARGET: "triggering"
           GH_AW_TEMPORARY_ID_MAP: ${{ steps.process_safe_outputs.outputs.temporary_id_map }}
