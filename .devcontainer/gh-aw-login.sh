@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[ -f "$BROWSER" ] && ! command -v xdg-open > /dev/null && sudo ln -s "$BROWSER" /usr/local/bin/xdg-open
+
 # Authenticate with GitHub CLI
 echo "Checking gh auth status..."
 if ! gh auth status >/dev/null 2>&1; then
