@@ -87,9 +87,9 @@ Use the tools to get:
 - **All existing review comments on the PR** — filter for comments whose body contains the marker `<!-- gh-aw-workflow-id: grumpy-compliance-officer -->` (automatically injected by safe-outputs into every comment this workflow creates). These are your prior comments. For each one, note:
   - `id` (numeric comment ID) — used for `reply-to-pull-request-review-comment`
   - `path` (file) and body text — to identify which standard/rule it references
-- **The PR’s review threads** — query the PR’s review threads (via GraphQL `pullRequest.reviewThreads`) to get each thread’s `id` (GraphQL `PRRT_...` ID, needed for `resolve-pull-request-review-thread`). Each thread contains comments — match threads to your discovered comments by the comment content.
+- **The PR's review threads** — query the PR's review threads to get each thread's ID (needed for `resolve-pull-request-review-thread`). Each thread contains comments — match threads to your discovered comments by the comment content.
 
-> **Important:** The REST API’s `node_id` for a review comment is `PRRC_...` (the comment’s GraphQL ID), which is NOT the same as the thread’s `PRRT_...` ID. You must get thread IDs from the `reviewThreads` query.
+> **Important:** A review comment's ID and its parent thread's ID are **different values from different API endpoints**. Do not use the comment's `node_id` as a thread ID — you must get thread IDs from the review threads query.
 
 This API-based discovery is the **primary mechanism** for identifying prior comments and avoiding duplicates — it works even if cache-memory was evicted.
 
@@ -127,7 +127,7 @@ Using the workflow-marker-filtered comments and review threads from Step 2, matc
 
 For each matched prior comment you need two IDs:
 - The comment’s numeric `id` → for `reply-to-pull-request-review-comment`
-- The parent thread’s GraphQL `PRRT_...` ID → for `resolve-pull-request-review-thread`
+- The parent thread's ID (from the review threads query) → for `resolve-pull-request-review-thread`
 
 Classify each prior comment as:
 - **Still violated** — the same standard is still violated in the same file
@@ -136,7 +136,7 @@ Classify each prior comment as:
 #### 4C: Act on each classification
 
 **For fixed violations** (the developer addressed your feedback):
-- Call `resolve-pull-request-review-thread` with the thread’s `PRRT_...` ID (from the review threads query, not the comment’s `node_id`)
+- Call `resolve-pull-request-review-thread` with the thread's ID (from the review threads query, not the comment's `node_id`)
 - Reluctantly acknowledge the fix was made
 
 **For still-violated issues** (the developer ignored your feedback):
