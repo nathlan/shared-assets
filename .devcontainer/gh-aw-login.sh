@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 
-# Authenticate with GitHub CLI
-echo "Checking gh auth status..."
-if ! gh auth status >/dev/null 2>&1; then
-    echo "You need to authenticate with \`gh\` CLI to use some gh-aw features"
-    gh auth login -w -p https
-    if gh auth status >/dev/null 2>&1; then
-        echo "✓ gh CLI authenticated successfully"
-    else
-        echo "✗ gh CLI authentication failed"
-        exit 1
-    fi
-else
-    echo "✓ gh CLI already authenticated"
-fi
+[ -f "$BROWSER" ] && ! command -v xdg-open > /dev/null && sudo ln -s "$BROWSER" /usr/local/bin/xdg-open
 
+# Inform user about gh authentication
 echo ""
 echo "=========================================================================="
-echo "Setup complete!"
-echo "You can now use GitHub Copilot Chat to create and manage agentic workflows"
+echo "GitHub CLI Authentication Required"
+echo "=========================================================================="
+echo ""
+echo "This repo contains GitHub Agentic Workflows (gh-aw). To use all features,"
+echo "you need to authenticate with GitHub CLI by running:"
+echo ""
+echo "  gh auth login"
+echo ""
 echo "=========================================================================="

@@ -15,15 +15,6 @@ network:
 tools:
   github:
     toolsets: [actions, issues, repos]
-engine:
-  id: copilot
-  steps:
-    - name: Checkout source repo to sync from
-      uses: actions/checkout@v6
-      with:
-        repository: nathlan/shared-assets
-        token: ${{ secrets.GH_AW_AGENT_TOKEN }}
-        path: source-repo
 safe-outputs:
   github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
   create-issue:
@@ -32,6 +23,14 @@ safe-outputs:
     labels: [agentic-workflow, shared-assets-sync, platform-engineering]
     close-older-issues: true
     max: 1
+steps:
+  - name: Checkout source repo to sync from
+    uses: actions/checkout
+    with:
+      repository: nathlan/shared-assets
+      token: ${{ secrets.GH_AW_AGENT_TOKEN }}
+      path: source-repo
+      persist-credentials: false
 ---
 
 # Sync Shared Assets from Source
