@@ -43,6 +43,8 @@ Current sync scope:
 - `sync/.devcontainer/**` -> `.devcontainer/**`
 - `sync/.vscode/**` -> `.vscode/**`
 
+File types in scope include all files under the mapped paths, including Markdown and text files such as `.md`, `.mdx`, `.txt`, `.json`, `.yml`, and `.yaml`.
+
 ## GitHub navigation guide
 
 - **Source repo**: `nathlan/shared-assets`
@@ -65,6 +67,7 @@ Current sync scope:
 - `source-repo/sync/.devcontainer/**` -> `.devcontainer/**`
 - `source-repo/sync/.vscode/**` -> `.vscode/**`
 
+- Compare every file type in those paths.
 - Identify files that are missing in local target paths.
 - Identify files that have changed content compared to source.
 - Ignore files outside the mapped scope above.
@@ -78,6 +81,7 @@ Current sync scope:
 - The issue body must include:
   - Steps for Copilot to perform the update:
     - Provide copilot a list of new files to add/replace locally from the `nathlan/shared-assets` repository. 
+      - Include Markdown and documentation updates (`.md`, `.mdx`, `.txt`) when they differ.
       - If you instruct copilot to retrieve the new file, make sure it removes the preamble before the code starts. For example, on the first line, the code used to be just `#`, but after copilot processed the file it looked like this: `successfully downloaded text file (SHA: ef9bd9a087ef88a25981e3a00bb335ca5af6ba07)#`
       - Include each file with explicit source -> target path mapping (for example: `source-repo/sync/.vscode/mcp.json` -> `.vscode/mcp.json`).
       - You should only instruct copilot to replace an entire file if the local file has no unique content that is not present in the source file. 
