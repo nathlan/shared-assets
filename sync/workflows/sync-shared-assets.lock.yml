@@ -23,7 +23,7 @@
 #
 # Sync content from the `nathlan/shared-assets/sync/` directory to the `.github/` directory in this repository.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"c2848c26867c834a498b12843d6c4ea0277b72a8646bd69c6954b868e9314e4a","compiler_version":"v0.49.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"459507af2835d3fa6c3f617c0087702fd0c034e25f37c8daeed0ac14e202fb98","compiler_version":"v0.49.1"}
 
 name: "Sync Shared Assets"
 "on":
@@ -276,7 +276,7 @@ jobs:
       - name: Create gh-aw temp directory
         run: bash /opt/gh-aw/actions/create_gh_aw_tmp_dir.sh
       - name: Checkout source repo to sync from
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout
         with:
           path: source-repo
           persist-credentials: false

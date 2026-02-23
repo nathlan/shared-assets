@@ -25,7 +25,7 @@ safe-outputs:
     max: 1
 steps:
   - name: Checkout source repo to sync from
-    uses: actions/checkout@v6.0.2
+    uses: actions/checkout
     with:
       repository: nathlan/shared-assets
       token: ${{ secrets.GH_AW_AGENT_TOKEN }}
