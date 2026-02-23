@@ -34,8 +34,7 @@
     "ghcr.io/devcontainers/features/github-cli:1": {
     },
     "ghcr.io/devcontainers/features/copilot-cli:1": {
-    },
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    }
   },
   "postCreateCommand": "chmod +x .devcontainer/gh-aw-login.sh && sudo apt-get update && sudo apt-get install -y xdg-utils && curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash",
   "postAttachCommand": ".devcontainer/gh-aw-login.sh"
