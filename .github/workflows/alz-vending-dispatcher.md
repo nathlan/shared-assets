@@ -14,12 +14,10 @@ network:
     - github
 tools:
   github:
-    github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
     toolsets: [issues, repos]
 engine:
   id: copilot
 safe-outputs:
-  github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
   assign-to-agent:
     name: "copilot"
     custom-agent: "alz-vending"
