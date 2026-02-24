@@ -63,9 +63,10 @@ These tools are injected by the safe-outputs runtime. They are the ONLY way to p
 
 ### Important
 
-1. **Always use `issue_read` to read issue data** — do not try to parse context variables or call APIs directly.
-2. **Always use the safe-output tools for writes** — do not use `issue_write`, `add_issue_comment`, `assign_copilot_to_issue`, or any other GitHub MCP write tool. Those are available in the MCP server but writes MUST go through safe-outputs.
-3. **If a tool call fails**, use `noop` to report the issue. Never fall back to CLI commands.
+1. **Use `issue_read` first, always** — the first tool call MUST be `issue_read` for the triggering issue (`method: "get_labels"` on opened events, `method: "get"` on closed events). Do not parse context variables or call APIs directly.
+2. **Gate all writes behind a successful read** — do not call any write tool until that `issue_read` succeeds; once it succeeds, follow the label-gated logic exactly as written.
+3. **Use only safe-output tools for writes** — do not use `issue_write`, `add_issue_comment`, `assign_copilot_to_issue`, or other GitHub MCP write tools; writes MUST go through safe-outputs.
+4. **Handle failures deterministically** — if `issue_read` fails, call `noop` with the concrete failure reason and stop; do not claim GitHub MCP read tools are unavailable (or call `missing_tool`) unless that `issue_read` call returned an explicit tool/runtime error; never fall back to CLI commands.
 
 ---
 
