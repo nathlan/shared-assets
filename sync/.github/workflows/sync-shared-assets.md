@@ -25,6 +25,7 @@ network:
     - github
 tools:
   github:
+    mode: remote
     toolsets: [actions, issues, repos]
 safe-outputs:
   github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
@@ -74,8 +75,24 @@ File types in scope include all files under the mapped paths, including Markdown
 - Compare every file type in those paths.
 - Identify files that are missing in local target paths.
 - Identify files that have changed content compared to source.
+- Identify lines/blocks present in target but removed from source, and treat those as required deletions.
 - Ignore files outside the mapped scope above.
 - **Note**: This is a one way sync, we never sync changes back to the `source-repo/sync/` folder.
+
+### Historical intent verification (required)
+
+For every target-only line/block found in mapped paths, you must verify intent using history before deciding whether to preserve or delete:
+
+1. Check local repository history for the target file (for example with `git log -p -- <target-path>` and `git blame <target-path>`).
+2. Check upstream history for the mapped source file in `nathlan/shared-assets` using `github` tools (`repos` toolset) and inspect recent commits touching the source path.
+3. If upstream history shows that the line/block was removed (or the related input/setting was removed), treat it as intentional upstream deletion and instruct removal downstream.
+4. If history is unavailable or ambiguous, default to source-authoritative behavior and remove the target-only line/block.
+
+### Deletion precedence rules (critical)
+
+- The source file in `/tmp/gh-aw/agent/source-repo/sync/**` is authoritative for synced paths.
+- If a line/setting exists in target but does not exist in source, it is drift and must be removed unless history verification proves an intentional downstream-only customization that is still valid.
+- Do **not** classify a line as "unique local content to preserve" when that line was intentionally removed upstream.
 
 4) **Create Issue**: If you've determined there are changes required in this repository:
 
@@ -89,7 +106,9 @@ File types in scope include all files under the mapped paths, including Markdown
       - If you instruct copilot to retrieve the new file, make sure it removes the preamble before the code starts. For example, on the first line, the code used to be just `#`, but after copilot processed the file it looked like this: `successfully downloaded text file (SHA: ef9bd9a087ef88a25981e3a00bb335ca5af6ba07)#`
       - Include each file with explicit source -> target path mapping (for example: `/tmp/gh-aw/agent/source-repo/sync/.vscode/mcp.json` -> `.vscode/mcp.json`).
       - You should only instruct copilot to replace an entire file if the local file has no unique content that is not present in the source file. 
-      - If there is unique content in the local file, you should provide line by line instructions to copilot on how to update the file instead of replacing the entire file. Be specific and don't leave anything to the copilot cloud coding agent to determine itself.  
+      - If there is unique content in the local file, you should provide line by line instructions to copilot on how to update the file instead of replacing the entire file. Be specific and don't leave anything to the copilot cloud coding agent to determine itself.
+      - When source removed lines that still exist in target, add explicit **deletion** instructions (find + remove exact lines). Do not mark those lines as preserve/unique.
+      - Include a short `Deletion rationale` section when removals are instructed, stating that upstream intentionally removed those lines.
   - Explicit instructions to the copilot agent, where:
     - The PR title must start with `[shared-assets-sync] `
     - The PR must have the same labels as the issue i.e. `[agentic-workflow, shared-assets-sync, platform-engineering]`
