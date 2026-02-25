@@ -101,7 +101,8 @@ For every target-only line/block found in mapped paths, you must verify intent u
 
 4) **Create Issue**: If you've determined there are changes required in this repository:
 
-- **Upload source files**: For every source file that is new or has changed content, use the `upload_asset` safe output to upload it from its path under `/tmp/gh-aw/agent/source-repo/sync/`. Strip the `/tmp/gh-aw/agent/source-repo/sync/` prefix when naming the uploaded asset so the filename mirrors the target repository path (e.g. upload `/tmp/gh-aw/agent/source-repo/sync/.github/workflows/foo.yml` as `.github/workflows/foo.yml`).
+- **Upload source files**: For every source file that is new or has changed content, use the `upload_asset` safe output to upload it from its path under `/tmp/gh-aw/agent/source-repo/sync/`.
+  - **Important**: The `upload_asset` tool stores files on the asset branch using **content-hash filenames** (e.g. `c82d7f99...db0.json`), not the name you provide. After each upload, record the **actual hash-based filename** returned by the tool — you will need it for the issue instructions.
   - Files without a recognised extension (e.g. `CODEOWNERS`, `.gitignore`) cannot be uploaded via `upload_asset`. For those files, embed their full content directly in the issue body inside a collapsible `<details>` block with a fenced code block.
 
 - **Create the issue** using the `create-issue` safe output.
@@ -109,10 +110,10 @@ For every target-only line/block found in mapped paths, you must verify intent u
   - The issue title must start with `[shared-assets-sync]`.
   - The issue body must include:
     - A brief summary of what changed and why.
-    - A **file manifest** table with columns: **Asset name** (as uploaded), **Target path** (repo-root-relative), **Action** (`add` | `replace` | `update`).
+    - A **file manifest** table with columns: **Asset name** (the hash-based filename returned by `upload_asset`), **Target path** (repo-root-relative), **Action** (`add` | `replace` | `update`).
     - Step-by-step instructions for the Copilot coding agent:
       1. Fetch the asset branch that contains the source files: `git fetch origin assets/sync-shared-assets`
-      2. For each file in the manifest, read it from the asset branch and write it to the target path: `git show origin/assets/sync-shared-assets:<asset-name> > <target-path>`
+      2. For each file in the manifest, read it from the asset branch using the **hash-based asset name** and write it to the target path: `git show origin/assets/sync-shared-assets:<hash-asset-name> > <target-path>` (e.g. `git show origin/assets/sync-shared-assets:c82d7f99...db0.yml > .github/workflows/foo.yml`)
       3. For files requiring **partial updates** (unique local content to preserve), provide **line-by-line instructions** with the exact content to find and replace. Do not leave anything for the agent to decide.
       4. For files with **deletion** instructions (lines removed upstream), provide explicit find-and-remove instructions with a short `Deletion rationale` section.
       5. For extensionless files embedded directly in the issue body, instruct the agent to write the embedded content verbatim to the target path.
