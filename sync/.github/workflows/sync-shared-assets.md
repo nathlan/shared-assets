@@ -29,6 +29,11 @@ tools:
     toolsets: [actions, issues, repos]
 safe-outputs:
   github-token: ${{ secrets.GH_AW_AGENT_TOKEN }}
+  upload-asset:
+    branch: "assets/sync-shared-assets"
+    allowed-exts: [.md, .json, .yml, .yaml]
+    max-size: 10240
+    max: 50
   create-issue:
     assignees: [copilot]
     title-prefix: "[shared-assets-sync] "
@@ -59,7 +64,7 @@ File types in scope include all files under the mapped paths, including Markdown
 ## Tools
 
 - You have access to `github` tools.
-- You have the `safeoutputs` tools to create issues on the current repository.
+- You have the `safeoutputs` tools: `create_issue` to create issues, and `upload_asset` to upload source files to the `assets/sync-shared-assets` orphaned branch.
 - You also have the `noop` safe output tool for no-change runs.
 
 ## Sync Process
@@ -96,22 +101,30 @@ For every target-only line/block found in mapped paths, you must verify intent u
 
 4) **Create Issue**: If you've determined there are changes required in this repository:
 
-- Create an issue in this repository using the `create-issue` safe output.
-- The issue must be assigned to `copilot`.
-- The issue title must start with `[shared-assets-sync]`.
-- The issue body must include:
-  - Steps for Copilot to perform the update:
-    - Provide copilot a list of new files to add/replace locally from `/tmp/gh-aw/agent/source-repo/` (which mirrors `nathlan/shared-assets`). 
-      - Include Markdown and documentation updates (`.md`, `.mdx`, `.txt`) when they differ.
-      - If you instruct copilot to retrieve the new file, make sure it removes the preamble before the code starts. For example, on the first line, the code used to be just `#`, but after copilot processed the file it looked like this: `successfully downloaded text file (SHA: ef9bd9a087ef88a25981e3a00bb335ca5af6ba07)#`
-      - Include each file with explicit source -> target path mapping (for example: `/tmp/gh-aw/agent/source-repo/sync/.vscode/mcp.json` -> `.vscode/mcp.json`).
-      - You should only instruct copilot to replace an entire file if the local file has no unique content that is not present in the source file. 
-      - If there is unique content in the local file, you should provide line by line instructions to copilot on how to update the file instead of replacing the entire file. Be specific and don't leave anything to the copilot cloud coding agent to determine itself.
-      - When source removed lines that still exist in target, add explicit **deletion** instructions (find + remove exact lines). Do not mark those lines as preserve/unique.
-      - Include a short `Deletion rationale` section when removals are instructed, stating that upstream intentionally removed those lines.
-  - Explicit instructions to the copilot agent, where:
-    - The PR title must start with `[shared-assets-sync] `
-    - The PR must have the same labels as the issue i.e. `[agentic-workflow, shared-assets-sync, platform-engineering]`
+- **Upload source files**: For every source file that is new or has changed content, use the `upload_asset` safe output to upload it from its path under `/tmp/gh-aw/agent/source-repo/sync/`. Strip the `/tmp/gh-aw/agent/source-repo/sync/` prefix when naming the uploaded asset so the filename mirrors the target repository path (e.g. upload `/tmp/gh-aw/agent/source-repo/sync/.github/workflows/foo.yml` as `.github/workflows/foo.yml`).
+  - Files without a recognised extension (e.g. `CODEOWNERS`, `.gitignore`) cannot be uploaded via `upload_asset`. For those files, embed their full content directly in the issue body inside a collapsible `<details>` block with a fenced code block.
+
+- **Create the issue** using the `create-issue` safe output.
+  - The issue will automatically be assigned to `copilot`.
+  - The issue title must start with `[shared-assets-sync]`.
+  - The issue body must include:
+    - A brief summary of what changed and why.
+    - A **file manifest** table with columns: **Asset name** (as uploaded), **Target path** (repo-root-relative), **Action** (`add` | `replace` | `update`).
+    - Step-by-step instructions for the Copilot coding agent:
+      1. Fetch the asset branch that contains the source files:
+         ```
+         git fetch origin assets/sync-shared-assets
+         ```
+      2. For each file in the manifest, read it from the asset branch and write it to the target path:
+         ```
+         git show origin/assets/sync-shared-assets:<asset-name> > <target-path>
+         ```
+      3. For files requiring **partial updates** (unique local content to preserve), provide **line-by-line instructions** with the exact content to find and replace. Do not leave anything for the agent to decide.
+      4. For files with **deletion** instructions (lines removed upstream), provide explicit find-and-remove instructions with a short `Deletion rationale` section.
+      5. For extensionless files embedded directly in the issue body, instruct the agent to write the embedded content verbatim to the target path.
+      6. Create a PR with:
+         - Title starting with `[shared-assets-sync] `
+         - Labels: `agentic-workflow`, `shared-assets-sync`, `platform-engineering`
 
 5) **No Changes**: If you've determined there are no changes required in this repository:
 
