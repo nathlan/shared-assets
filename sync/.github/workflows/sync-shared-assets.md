@@ -111,20 +111,12 @@ For every target-only line/block found in mapped paths, you must verify intent u
     - A brief summary of what changed and why.
     - A **file manifest** table with columns: **Asset name** (as uploaded), **Target path** (repo-root-relative), **Action** (`add` | `replace` | `update`).
     - Step-by-step instructions for the Copilot coding agent:
-      1. Fetch the asset branch that contains the source files:
-         ```
-         git fetch origin assets/sync-shared-assets
-         ```
-      2. For each file in the manifest, read it from the asset branch and write it to the target path:
-         ```
-         git show origin/assets/sync-shared-assets:<asset-name> > <target-path>
-         ```
+      1. Fetch the asset branch that contains the source files: `git fetch origin assets/sync-shared-assets`
+      2. For each file in the manifest, read it from the asset branch and write it to the target path: `git show origin/assets/sync-shared-assets:<asset-name> > <target-path>`
       3. For files requiring **partial updates** (unique local content to preserve), provide **line-by-line instructions** with the exact content to find and replace. Do not leave anything for the agent to decide.
       4. For files with **deletion** instructions (lines removed upstream), provide explicit find-and-remove instructions with a short `Deletion rationale` section.
       5. For extensionless files embedded directly in the issue body, instruct the agent to write the embedded content verbatim to the target path.
-      6. Create a PR with:
-         - Title starting with `[shared-assets-sync] `
-         - Labels: `agentic-workflow`, `shared-assets-sync`, `platform-engineering`
+      6. Instructions for `copilot` to update the existing PR title to be start with `[shared-assets-sync] ` followed by a concise description of the change (e.g. "sync upstream changes to .github/workflows/foo.yml").
 
 5) **No Changes**: If you've determined there are no changes required in this repository:
 
