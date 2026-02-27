@@ -218,17 +218,20 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-    
-      - name: Azure Login (OIDC) - TFSTATE Identity (backend)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # Commenting this out to see if OIDC auth works directly with terraform init.
+      # - name: Azure Login (OIDC) - TFSTATE Identity (backend)
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Terraform Init (backend) using TFSTATE identity
         working-directory: ${{ inputs.working-directory }}
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="storage_account_name=sttfstateagentictest" \
+            -backend-config="container_name=tfstate"
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
