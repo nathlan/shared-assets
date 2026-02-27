@@ -75,9 +75,6 @@ on:
         type: string
         default: 'terraform'
     secrets:
-      AZURE_CLIENT_ID_TFSTATE:
-        description: 'Azure User-Assigned Managed Identity Client ID for terraform init/backend state access'
-        required: true
       AZURE_CLIENT_ID_PLAN:
         description: 'Azure User-Assigned Managed Identity Client ID for plan operations (Reader role)'
         required: true
@@ -229,7 +226,6 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         run: terraform init
         env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_USE_OIDC: true
@@ -322,7 +318,6 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
         run: terraform init
         env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_USE_OIDC: true
