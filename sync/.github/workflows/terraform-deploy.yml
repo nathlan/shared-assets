@@ -49,8 +49,7 @@ jobs:
   # Call the parent reusable workflow from the central repository
   deploy:
     name: Deploy to Azure
-    # uses: nathlan/shared-assets/.github/workflows/azure-terraform-deploy.yml@feature/CICD
-    uses: nathlan/shared-assets/.github/workflows/azure-terraform-deploy.yml@main
+    uses: nathlan/shared-assets/.github/workflows/azure-terraform-deploy.yml@feature/CICD
 
     with:
       # REQUIRED: Deployment environment (must match environment in repo settings)
@@ -62,6 +61,7 @@ jobs:
     secrets:
       # REQUIRED: Azure OIDC credentials (configure in repository settings)
       # SECURITY: Two separate User-Assigned Managed Identities for least-privilege access
+      AZURE_CLIENT_ID_TFSTATE: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
       AZURE_CLIENT_ID_PLAN: ${{ secrets.AZURE_CLIENT_ID_PLAN }}   # Reader role for plan
       AZURE_CLIENT_ID_APPLY: ${{ secrets.AZURE_CLIENT_ID_APPLY }} # Owner role for apply
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
