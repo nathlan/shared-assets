@@ -208,6 +208,8 @@ jobs:
     name: Terraform Plan
     runs-on: ubuntu-latest
     needs: [validate, security]
+    permissions:
+      id-token: write
 
     steps:
       - name: Checkout code
