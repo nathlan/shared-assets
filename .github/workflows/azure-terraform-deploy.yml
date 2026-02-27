@@ -218,20 +218,24 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-      - name: Azure Login (OIDC) - Plan Identity
+    
+      - name: Azure Login (OIDC) - TFSTATE Identity (backend)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Terraform Init
+      - name: Terraform Init (backend) using TFSTATE identity
         working-directory: ${{ inputs.working-directory }}
         run: terraform init
         env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          ARM_USE_OIDC: "true"
+          ARM_USE_AZUREAD_AUTH: "true"
+
 
       - name: Terraform Plan
         id: plan
