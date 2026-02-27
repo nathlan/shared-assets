@@ -94,7 +94,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  # id-token: write
+  id-token: write
   issues: write
   security-events: write
 
@@ -218,13 +218,12 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-      # # Commenting this out to see if OIDC auth works directly with terraform init.
-      # - name: Azure Login (OIDC) - TFSTATE Identity (backend)
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Azure Login (OIDC) - TFSTATE Identity (backend)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
 
       - name: Terraform Init (backend) using TFSTATE identity
@@ -234,13 +233,28 @@ jobs:
             -backend-config="storage_account_name=sttfstateagentictest" \
             -backend-config="container_name=tfstate"
         env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: "true"
+          # ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
+          # ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          # ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # ARM_USE_OIDC: "true"
           ARM_USE_AZUREAD_AUTH: "true"
 
+      - name: Azure logout via Azure CLI
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az logout
+            # Optional: clear CLI cache and account data
+            az cache purge
+            az account clear
 
+      - name: Azure Login (OIDC) - TFSTATE Identity (backend)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
       - name: Terraform Plan
         id: plan
         working-directory: ${{ inputs.working-directory }}
