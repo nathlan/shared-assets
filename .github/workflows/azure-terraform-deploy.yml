@@ -259,7 +259,7 @@ jobs:
         id: plan
         working-directory: ${{ inputs.working-directory }}
         run: |
-          terraform plan -no-color -out=tfplan
+          terraform plan -no-color -out=tfplan -lock-timeout=300s
           terraform show -no-color tfplan > plan.txt
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
