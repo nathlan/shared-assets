@@ -218,48 +218,33 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-      # - name: Azure Login (OIDC) - TFSTATE Identity (backend)
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-
+      # ----------------------------------------------------------------
+      # Backend auth: credentials passed via -backend-config so they are
+      # persisted in .terraform/ and used for ALL subsequent state operations,
+      # independent of ARM_* env vars set for the provider.
+      # ----------------------------------------------------------------
       - name: Terraform Init (backend) using TFSTATE identity
         working-directory: ${{ inputs.working-directory }}
         run: |
           terraform init \
             -backend-config="storage_account_name=sttfstateagentictest" \
-            -backend-config="container_name=tfstate"
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: "true"
-          ARM_USE_AZUREAD_AUTH: "true"
+            -backend-config="container_name=tfstate" \
+            -backend-config="client_id=${{ secrets.AZURE_CLIENT_ID_TFSTATE }}" \
+            -backend-config="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+            -backend-config="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            -backend-config="use_oidc=true" \
+            -backend-config="use_azuread_auth=true"
 
-      # - name: Azure logout via Azure CLI
-      #   uses: azure/cli@v2
-      #   with:
-      #     inlineScript: |
-      #       az logout
-      #       # Optional: clear CLI cache and account data
-      #       az cache purge
-      #       az account clear
-
-      # - name: Azure Login (OIDC) - TFSTATE Identity (backend)
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
+      # ----------------------------------------------------------------
+      # Provider auth: ARM_* env vars are used by the azurerm provider
+      # for resource operations. The backend ignores these because its
+      # credentials were persisted via -backend-config above.
+      # ----------------------------------------------------------------
       - name: Terraform Plan
         id: plan
         working-directory: ${{ inputs.working-directory }}
         run: |
-          terraform plan -no-color -out=tfplan
+          terraform plan -no-color -out=tfplan -lock-timeout=300s
           terraform show -no-color tfplan > plan.txt
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
@@ -326,27 +311,33 @@ jobs:
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
-      - name: Azure Login (OIDC) - Apply Identity
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID_APPLY }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
         with:
           name: terraform-plan-${{ inputs.environment }}
           path: ${{ inputs.working-directory }}
 
-      - name: Terraform Init
+      # ----------------------------------------------------------------
+      # Backend auth: same pattern as plan job — persist TFSTATE identity
+      # credentials in -backend-config so state operations use the correct
+      # identity, independent of ARM_* env vars set for the provider.
+      # ----------------------------------------------------------------
+      - name: Terraform Init (backend) using TFSTATE identity
         working-directory: ${{ inputs.working-directory }}
-        run: terraform init
-        env:
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+        run: |
+          terraform init \
+            -backend-config="storage_account_name=sttfstateagentictest" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="client_id=${{ secrets.AZURE_CLIENT_ID_TFSTATE }}" \
+            -backend-config="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+            -backend-config="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            -backend-config="use_oidc=true" \
+            -backend-config="use_azuread_auth=true"
 
+      # ----------------------------------------------------------------
+      # Provider auth: ARM_* env vars target the APPLY identity (Owner role)
+      # for resource modifications. Backend uses persisted TFSTATE identity.
+      # ----------------------------------------------------------------
       - name: Terraform Apply
         working-directory: ${{ inputs.working-directory }}
         run: terraform apply -auto-approve tfplan
