@@ -53,8 +53,7 @@ shared-assets/
 │       ├── github-config-dispatcher.md     # [Agentic Workflow definition]
 │       └── github-config-dispatcher.lock.yml # [Compiled agentic workflow]
 ├── .vscode/                                # VS Code settings
-│   ├── mcp.json                            # MCP servers (github, terraform, gh-aw)
-│   └── settings.json                       # Editor config
+│   └── mcp.json                            # MCP servers (github, terraform, gh-aw)
 ├── sync/                                   # Sync'd content (replicated to other repos)
 │   ├── .devcontainer/
 │   ├── .github/
