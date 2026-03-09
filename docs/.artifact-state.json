@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "generated_at_utc": "2026-03-09T00:00:00Z",
+  "target_org": "insight-agentic-platform-project",
+  "target_repo": "shared-assets",
+  "source_org": "nathlan",
+  "artifacts": {
+    "docs/analysis.md": {
+      "step": 1,
+      "artifact_path": "docs/analysis.md",
+      "description": "Codebase Analysis - complete inventory of repository components and dependencies",
+      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "repo_head_commit": "HEAD",
+      "source_files": {
+        ".github/workflows/alz-vending-dispatcher.md": "latest",
+        ".github/workflows/github-config-dispatcher.md": "latest",
+        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".github/agents/agentic-workflows.agent.md": "latest",
+        ".github/agents/cicd-workflows.agent.md": "latest",
+        ".github/prompts/generate-documentation.prompt.md": "latest",
+        ".github/instructions/github-actions-ci-cd-best-practices.instructions.md": "latest",
+        ".devcontainer/devcontainer.json": "latest",
+        ".vscode/mcp.json": "latest",
+        "README.md": "latest"
+      }
+    },
+    "docs/prerequisites.md": {
+      "step": 2,
+      "artifact_path": "docs/prerequisites.md",
+      "description": "Prerequisites Reference - setup requirements, secrets, checklist, migration guide",
+      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "repo_head_commit": "HEAD",
+      "source_files": {
+        "docs/analysis.md": "latest",
+        ".github/workflows/alz-vending-dispatcher.md": "latest",
+        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".vscode/mcp.json": "latest"
+      }
+    },
+    "docs/SETUP.md": {
+      "step": 3,
+      "artifact_path": "docs/SETUP.md",
+      "description": "Setup Guide - phase-by-phase deployment instructions with validation steps",
+      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "repo_head_commit": "HEAD",
+      "source_files": {
+        "docs/analysis.md": "latest",
+        "docs/prerequisites.md": "latest"
+      }
+    },
+    "docs/ARCHITECTURE.md": {
+      "step": 4,
+      "artifact_path": "docs/ARCHITECTURE.md",
+      "description": "Architecture Overview - how components work together, authentication models, lifecycle",
+      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "repo_head_commit": "HEAD",
+      "source_files": {
+        "docs/analysis.md": "latest",
+        ".github/workflows/alz-vending-dispatcher.md": "latest",
+        ".github/workflows/github-config-dispatcher.md": "latest",
+        ".github/agents/documentation-conductor.agent.md": "latest",
+        ".github/agents/se-technical-writer.agent.md": "latest",
+        ".github/workflows/azure-terraform-deploy.yml": "latest"
+      }
+    },
+    "README.md": {
+      "step": 5,
+      "artifact_path": "README.md",
+      "description": "Repository entry point - project summary, quick-start, links to full documentation",
+      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "repo_head_commit": "HEAD",
+      "source_files": {
+        "docs/analysis.md": "latest",
+        "docs/prerequisites.md": "latest",
+        "docs/SETUP.md": "latest",
+        "docs/ARCHITECTURE.md": "latest",
+        ".github/workflows/alz-vending-dispatcher.md": "latest",
+        ".github/workflows/github-config-dispatcher.md": "latest",
+        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".devcontainer/devcontainer.json": "latest"
+      }
+    }
+  },
+  "completion_summary": {
+    "total_steps": 5,
+    "completed_steps": 5,
+    "all_artifacts_generated": true,
+    "migration_context": {
+      "source_org": "nathlan",
+      "target_org": "insight-agentic-platform-project",
+      "org_references_flagged": true,
+      "migration_checklist_included": true
+    }
+  }
+}
