@@ -1,41 +1,67 @@
 {
-  "name": "Agentic Workflows Development",
-  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "name": "GitHub + Terraform Development",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
   "customizations": {
     "vscode": {
       "extensions": [
+        "hashicorp.terraform",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
         "GitHub.copilot",
         "GitHub.copilot-chat",
-        "redhat.vscode-yaml",
-        "DavidAnson.vscode-markdownlint",
-        "github.vscode-github-actions",
-        "GitHub.vscode-pull-request-github",
-        "michelemelluso.gitignore"
-      ]
-    },
-    "codespaces": {
-      "repositories": {
-        "nathlan/shared-assets": {
-          "permissions": {
-            "actions": "write",
-            "contents": "write",
-            "discussions": "read",
-            "issues": "read",
-            "pull-requests": "write",
-            "workflows": "write"
-          }
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "githubPullRequests.codingAgent.uiIntegration": true,
+        "terraform.languageServer.enable": true,
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "[terraform]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "hashicorp.terraform"
         }
       }
     }
   },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-    },
-    "ghcr.io/devcontainers/features/copilot-cli:1": {
-    }
+
+  "remoteUser": "vscode",
+
+  "remoteEnv": {
+    "TF_PLUGIN_CACHE_DIR": "${containerWorkspaceFolder}/.terraform.d/plugin-cache"
   },
-  "postCreateCommand": "chmod +x .devcontainer/gh-aw-login.sh && sudo apt-get update && sudo apt-get install -y xdg-utils && curl -fsSL https://raw.githubusercontent.com/github/gh-aw/refs/heads/main/install-gh-aw.sh | bash",
-  "postAttachCommand": ".devcontainer/gh-aw-login.sh"
+
+  "mounts": [
+    "source=${localEnv:HOME}/.azure,target=/home/vscode/.azure,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly"
+  ],
+
+  "forwardPorts": [],
+
+  "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }
