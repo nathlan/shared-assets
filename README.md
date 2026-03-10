@@ -39,7 +39,8 @@ shared-assets/
 │   │   └── se-technical-writer.agent.md    # [Documentation tooling]
 │   ├── instructions/                       # Copilot context
 │   │   ├── github-actions-ci-cd-best-practices.instructions.md
-│   │   └── markdown.instructions.md
+│   │   ├── markdown.instructions.md
+│   │   └── terraform.instructions.md
 │   ├── prompts/                            # VS Code prompts
 │   │   ├── generate-documentation.prompt.md
 │   │   ├── architecture-blueprint-generator.prompt.md  # [Documentation tooling]
@@ -48,7 +49,7 @@ shared-assets/
 │   └── workflows/                          # Reusable & Agentic Workflows
 │       ├── alz-vending-dispatcher.md       # [Agentic Workflow definition]
 │       ├── alz-vending-dispatcher.lock.yml # [Compiled agentic workflow]
-│       ├── azure-terraform-deploy.yml     # [Reusable workflow]
+│       ├── azure-terraform-cicd-reusable.yml # [Reusable workflow]
 │       ├── copilot-setup-steps.yml         # [Standard workflow]
 │       ├── github-config-dispatcher.md     # [Agentic Workflow definition]
 │       └── github-config-dispatcher.lock.yml # [Compiled agentic workflow]
@@ -97,13 +98,15 @@ Dispatches the `github-config` Copilot coding agent to issues labeled with `gith
 
 ---
 
-### [Reusable Workflow] `azure-terraform-deploy.yml`
+### [Reusable Workflow] `azure-terraform-cicd-reusable.yml`
 
-Production-ready Terraform deployment pipeline: validation → security scan (Checkov) → plan → apply. OIDC-based Azure authentication with separate Plan (Reader) and Apply (Owner) managed identities.
+Production-ready Terraform CI/CD pipeline: validation → security scan (Checkov) → plan → apply. Uses Azure Flexible Federated Identity Credentials (OIDC) with vars-based authentication — no secrets required. Separate Plan (Reader) and Apply (Owner) managed identities per repo.
 
-**Used by:** Consuming repositories via `uses: <YOUR_GITHUB_ORG>/shared-assets/.github/workflows/azure-terraform-deploy.yml@main`  
-**Jobs:** validate, security, plan, apply (with approval gate)  
-**Permissions:** `id-token: write` (OIDC), `pull-requests: write` (PR comments), `issues: write`, `security-events: write` (SARIF)
+**Used by:** Consuming repositories via `uses: <YOUR_GITHUB_ORG>/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@main`  
+**Jobs:** validate, security, plan, apply (main branch only)  
+**Auth:** Flexible Federated Identity Credentials — all values are `vars.*` inherited from the calling repo  
+**Workspace:** Uses `github.event.repository.name` as Terraform workspace name  
+**Permissions:** `id-token: write` (OIDC), `pull-requests: write` (PR comments with upsert), `issues: write`, `security-events: write` (SARIF)
 
 ---
 
@@ -113,7 +116,7 @@ Production-ready Terraform deployment pipeline: validation → security scan (Ch
 |-----------|------|------|---------|
 | **ALZ Vending Dispatch** | `.github/workflows/alz-vending-dispatcher.md` | Agentic Workflow | Issue → Agent assignment + cross-repo handoff |
 | **GitHub Config Dispatch** | `.github/workflows/github-config-dispatcher.md` | Agentic Workflow | Issue → Agent assignment + notification |
-| **Terraform Deploy** | `.github/workflows/azure-terraform-deploy.yml` | Reusable Workflow | Plan → Security scan → Apply with OIDC auth |
+| **Terraform CI/CD** | `.github/workflows/azure-terraform-cicd-reusable.yml` | Reusable Workflow | Validate → Security scan → Plan → Apply with Flexible Federated Identity Credentials (OIDC), vars-based auth |
 | **CI/CD Workflows Agent** | `.github/agents/cicd-workflows.agent.md` | Copilot Agent | Generates production GitHub Actions workflows |
 | **Agentic Workflows Agent** | `.github/agents/agentic-workflows.agent.md` | Copilot Agent | Dispatcher for gh-aw tasks (create, update, debug, upgrade) |
 | **GitHub CLI Extension** | (External) | Dependency | `gh aw` — Workflow compilation and deployment |

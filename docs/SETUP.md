@@ -384,38 +384,38 @@ gh issue list \
 
 ### Phase 5: Update Consuming Repositories
 
-For repositories that will use the reusable `azure-terraform-deploy.yml` workflow, update their workflow calls:
+For repositories that will use the reusable `azure-terraform-cicd-reusable.yml` workflow, update their workflow calls:
 
 #### Before (Source Org)
 ```yaml
-uses: nathlan/shared-assets/.github/workflows/azure-terraform-deploy.yml@main
+uses: nathlan/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@main
 ```
 
 #### After (Target Org)
 ```yaml
-uses: insight-agentic-platform-project/shared-assets/.github/workflows/azure-terraform-deploy.yml@main
+uses: insight-agentic-platform-project/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@main
 ```
 
 **Steps for each consuming repository:**
 
-1. **Locate workflow files that call azure-terraform-deploy.yml:**
+1. **Locate workflow files that call azure-terraform-cicd-reusable.yml:**
 
    ```bash
-   grep -r "azure-terraform-deploy" .github/workflows/
+   grep -r "azure-terraform-cicd-reusable" .github/workflows/
    ```
 
 2. **Update the `uses:` reference:**
 
    Replace the org name in any line like:
    ```yaml
-   uses: <ORG>/shared-assets/.github/workflows/azure-terraform-deploy.yml@<ref>
+   uses: <ORG>/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@<ref>
    ```
 
 3. **Commit and push:**
 
    ```bash
    git add .github/workflows/
-   git commit -m "chore: update azure-terraform-deploy workflow reference to target org"
+   git commit -m "chore: update azure-terraform-cicd-reusable workflow reference to target org"
    git push
    ```
 

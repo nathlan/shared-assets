@@ -9,16 +9,17 @@
       "step": 1,
       "artifact_path": "docs/analysis.md",
       "description": "Codebase Analysis - complete inventory of repository components and dependencies",
-      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "generated_at_utc": "2026-03-10T00:00:00Z",
       "repo_head_commit": "HEAD",
       "source_files": {
         ".github/workflows/alz-vending-dispatcher.md": "latest",
         ".github/workflows/github-config-dispatcher.md": "latest",
-        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".github/workflows/azure-terraform-cicd-reusable.yml": "latest",
         ".github/agents/agentic-workflows.agent.md": "latest",
         ".github/agents/cicd-workflows.agent.md": "latest",
         ".github/prompts/generate-documentation.prompt.md": "latest",
         ".github/instructions/github-actions-ci-cd-best-practices.instructions.md": "latest",
+        ".github/instructions/terraform.instructions.md": "latest",
         ".devcontainer/devcontainer.json": "latest",
         ".vscode/mcp.json": "latest",
         "README.md": "latest"
@@ -28,12 +29,12 @@
       "step": 2,
       "artifact_path": "docs/prerequisites.md",
       "description": "Prerequisites Reference - setup requirements, secrets, checklist, migration guide",
-      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "generated_at_utc": "2026-03-10T00:00:00Z",
       "repo_head_commit": "HEAD",
       "source_files": {
         "docs/analysis.md": "latest",
         ".github/workflows/alz-vending-dispatcher.md": "latest",
-        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".github/workflows/azure-terraform-cicd-reusable.yml": "latest",
         ".vscode/mcp.json": "latest"
       }
     },
@@ -41,7 +42,7 @@
       "step": 3,
       "artifact_path": "docs/SETUP.md",
       "description": "Setup Guide - phase-by-phase deployment instructions with validation steps",
-      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "generated_at_utc": "2026-03-10T00:00:00Z",
       "repo_head_commit": "HEAD",
       "source_files": {
         "docs/analysis.md": "latest",
@@ -52,7 +53,7 @@
       "step": 4,
       "artifact_path": "docs/ARCHITECTURE.md",
       "description": "Architecture Overview - how components work together, authentication models, lifecycle",
-      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "generated_at_utc": "2026-03-10T00:00:00Z",
       "repo_head_commit": "HEAD",
       "source_files": {
         "docs/analysis.md": "latest",
@@ -60,14 +61,14 @@
         ".github/workflows/github-config-dispatcher.md": "latest",
         ".github/agents/documentation-conductor.agent.md": "latest",
         ".github/agents/se-technical-writer.agent.md": "latest",
-        ".github/workflows/azure-terraform-deploy.yml": "latest"
+        ".github/workflows/azure-terraform-cicd-reusable.yml": "latest"
       }
     },
     "README.md": {
       "step": 5,
       "artifact_path": "README.md",
       "description": "Repository entry point - project summary, quick-start, links to full documentation",
-      "generated_at_utc": "2026-03-09T00:00:00Z",
+      "generated_at_utc": "2026-03-10T00:00:00Z",
       "repo_head_commit": "HEAD",
       "source_files": {
         "docs/analysis.md": "latest",
@@ -76,7 +77,7 @@
         "docs/ARCHITECTURE.md": "latest",
         ".github/workflows/alz-vending-dispatcher.md": "latest",
         ".github/workflows/github-config-dispatcher.md": "latest",
-        ".github/workflows/azure-terraform-deploy.yml": "latest",
+        ".github/workflows/azure-terraform-cicd-reusable.yml": "latest",
         ".devcontainer/devcontainer.json": "latest"
       }
     }

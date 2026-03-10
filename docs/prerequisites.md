@@ -51,19 +51,29 @@ Configure these secrets in your **GitHub organization** or in **consuming reposi
 
 **Org-Level Setting:** Settings → Secrets and variables → Actions → Repository secrets → New secret
 
-#### Azure Terraform Secrets (For Consuming Repositories)
+#### Azure Terraform Variables (For Consuming Repositories)
 
-These secrets are **NOT** required by shared-assets itself, but **consuming repositories** that use the `azure-terraform-deploy.yml` reusable workflow must provide them:
+These variables are **NOT** required by shared-assets itself, but **consuming repositories** that use the `azure-terraform-cicd-reusable.yml` reusable workflow must have them set as GitHub Actions variables. No secrets are needed — all values are non-sensitive identifiers resolved via OIDC token exchange using Flexible Federated Identity Credentials.
 
-| Secret | Purpose | Source |
-|--------|---------|--------|
-| `AZURE_CLIENT_ID_PLAN` | Managed Identity Client ID for Terraform plan (Read role) | Azure Entra ID — UAMI created in target org |
-| `AZURE_CLIENT_ID_APPLY` | Managed Identity Client ID for Terraform apply (Owner role) | Azure Entra ID — UAMI created in target org |
-| `AZURE_CLIENT_ID_TFSTATE` | Managed Identity Client ID for Terraform backend (state access) | Azure Entra ID — UAMI created in target org |
-| `AZURE_TENANT_ID` | Azure tenant ID for OIDC token exchange | Azure portal |
+**Organization-level vars** (set once at org level, inherited by all repos):
+
+| Variable | Purpose | Source |
+|----------|---------|--------|
+| `AZURE_CLIENT_ID_TFSTATE` | Managed Identity client ID for Terraform state access | Azure Entra ID — UAMI created in target tenant |
+| `AZURE_SUBSCRIPTION_ID_TFSTATE` | Subscription ID for Terraform state backend | Azure portal |
+| `AZURE_TENANT_ID` | Azure AD tenant ID for OIDC token exchange | Azure portal |
+| `BACKEND_STORAGE_ACCOUNT` | Storage account name for Terraform state | Azure portal |
+| `BACKEND_CONTAINER` | Blob container name for Terraform state | Azure portal |
+
+**Repository-level vars** (set per consuming repo):
+
+| Variable | Purpose | Source |
+|----------|---------|--------|
+| `AZURE_CLIENT_ID_PLAN` | Managed Identity client ID for Terraform plan (Reader role) | Azure Entra ID — UAMI created per repo |
+| `AZURE_CLIENT_ID_APPLY` | Managed Identity client ID for Terraform apply (Owner role) | Azure Entra ID — UAMI created per repo |
 | `AZURE_SUBSCRIPTION_ID` | Target Azure subscription for deployments | Azure portal |
 
-**Note:** These are passed by **consuming repositories** to the reusable workflow via `secrets:` in the workflow call. They are not configured on shared-assets itself.
+**Note:** These are inherited by the reusable workflow from the calling repo's `vars.*` context. No `secrets:` or `inputs:` are required to pass them.
 
 ## DevContainer Prerequisites
 
@@ -165,11 +175,11 @@ docker ps  # Verify Docker daemon access
 
 ### Environments
 
-Consuming repositories that use `azure-terraform-deploy.yml` may define environments for approval gates:
+Consuming repositories that use `azure-terraform-cicd-reusable.yml` may define environments for approval gates:
 
 | Environment | Purpose | Used By | Approval Required |
 |-------------|---------|---------|------------------|
-| `azure-production` | Production Azure deployments | Reusable workflow (apply job) | Yes (recommended) |
+| `azure-production` | Production Azure deployments | Consuming repo workflows | Yes (recommended) |
 | `github-admin` | GitHub admin operations | GitHub Config workflows | Yes (recommended) |
 
 **How to configure:**
@@ -200,7 +210,7 @@ Before pushing any code to the target org's shared-assets repository, perform th
 | `.github/workflows/alz-vending-dispatcher.md` | `nathlan/github-config` | `insight-agentic-platform-project/github-config` |
 | `.github/workflows/alz-vending-dispatcher.md` | `nathlan/alz-subscriptions` | `insight-agentic-platform-project/alz-subscriptions` |
 | `.github/workflows/github-config-dispatcher.md` | `nathlan` | `insight-agentic-platform-project` |
-| `.github/workflows/azure-terraform-deploy.yml` | `nathlan/shared-assets` | `insight-agentic-platform-project/shared-assets` |
+| `.github/workflows/azure-terraform-cicd-reusable.yml` | `nathlan/shared-assets` | `insight-agentic-platform-project/shared-assets` |
 | `sync/.github/workflows/sync-shared-assets.md` | `nathlan/shared-assets` | `insight-agentic-platform-project/shared-assets` |
 | `sync/.github/workflows/grumpy-compliance-officer.md` | `nathlan/shared-standards` | `insight-agentic-platform-project/shared-standards` |
 | `sync/.github/agents/grumpy-compliance-officer.agent.md` | `nathlan/shared-standards` | `insight-agentic-platform-project/shared-standards` |
@@ -228,7 +238,7 @@ Before pushing any code to the target org's shared-assets repository, perform th
 - [ ] **Agentic workflows compile without errors** (`gh aw compile` runs successfully)
 - [ ] **Agents can be assigned** — Test by creating an issue with appropriate label
 - [ ] **Cross-repo issues are created** — ALZ dispatcher creates issues in github-config without auth errors
-- [ ] **Terraform workflow can be invoked** — Call `azure-terraform-deploy.yml` from a test repo and verify plan step works
+- [ ] **Terraform workflow can be invoked** — Call `azure-terraform-cicd-reusable.yml` from a test repo and verify plan step works
 
 ## Dependent Teams/Repositories
 
@@ -239,7 +249,7 @@ The following teams/repositories depend on shared-assets and will need updates:
 | **ALZ Vending Team** | Uses `alz-vending-dispatcher.md` to assign agents | Update workflow references in `alz-subscriptions` |
 | **GitHub Config Team** | Uses `github-config-dispatcher.md` for repository automation | Update workflow references in `github-config` |
 | **Compliance Team** | Uses synced `grumpy-compliance-officer` agent | Ensure `shared-standards` repository exists and is accessible |
-| **All teams** | Call `azure-terraform-deploy.yml` in CI/CD pipelines | Update `uses:` references to point to target org |
+| **All teams** | Call `azure-terraform-cicd-reusable.yml` in CI/CD pipelines | Update `uses:` references to point to target org |
 
 ## Common Issues & Troubleshooting
 

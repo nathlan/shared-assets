@@ -24,10 +24,11 @@ The repository is designed to be **synced into consuming repositories** (ALZ pro
 │  │ Reusable Workflows │       │ Agentic Workflows    │  │
 │  │                    │       │ (Dispatchers)        │  │
 │  │ • azure-terraform  │       │                      │  │
-│  │   -deploy.yml      │       │ • alz-vending-      │  │
-│  │                    │       │   dispatcher.md      │  │
-│  │ • copilot-setup    │       │ • github-config-    │  │
-│  │   -steps.yml       │       │   dispatcher.md      │  │
+│  │   -cicd-reusable  │       │ • alz-vending-      │  │
+│  │   .yml            │       │   dispatcher.md      │  │
+│  │                    │       │ • github-config-    │  │
+│  │ • copilot-setup    │       │   dispatcher.md      │  │
+│  │   -steps.yml       │       │                      │  │
 │  └────────────────────┘       └──────────────────────┘  │
 │                                                          │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -44,6 +45,7 @@ The repository is designed to be **synced into consuming repositories** (ALZ pro
 │  │ • GitHub CLI + gh-aw extension                  │   │
 │  │ • CI/CD best practices instructions             │   │
 │  │ • Markdown standards                            │   │
+│  │ • Terraform conventions                         │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 
@@ -58,7 +60,8 @@ The repository is designed to be **synced into consuming repositories** (ALZ pro
 └──────────────────────────────────────────┘
          ↑ Both call ↑
 ┌──────────────────────────────────────────┐
-│ azure-terraform-deploy.yml (Reusable)   │
+│ azure-terraform-cicd-reusable.yml       │
+│ (Reusable, vars-based OIDC auth)        │
 └──────────────────────────────────────────┘
 ```
 
@@ -198,28 +201,25 @@ Documentation Conductor (local agent)
         └─ NO: [noop]
 ```
 
-### Pattern 2: Reusable Workflow Invocation (Azure Terraform Deploy)
+### Pattern 2: Reusable Workflow Invocation (Azure Terraform CI/CD)
 
 ```
 [Consuming repo (e.g., workload repo)]
         ↓
-[Workflow calls: azure-terraform-deploy.yml]
-  (as reusable workflow)
+[Workflow calls: azure-terraform-cicd-reusable.yml]
+  (as reusable workflow; vars inherited from caller context)
         ↓
 [validate job]: fmt, validate, tflint
         ↓
-[security job]: Checkov SARIF scan
+[security job]: Checkov SARIF scan (smart config detection)
         ↓
-[plan job]: terraform plan, upload artifact
+[plan job]: terraform plan (PLAN identity, Reader role)
         ↓
-[PR comment]: Show plan preview
+[PR comment]: Show plan preview (upsert pattern)
         ↓
 [apply job] (if main branch):
-  ├─ requires: environment: azure-production
-  ├─ requires: approval from reviewers
-  │     ↓
-  │ [terraform apply]
-  │ (executes plan)
+  ├─ terraform apply (APPLY identity, Owner role)
+  └─ outputs uploaded as artifact
 ```
 
 ## Authentication Model
@@ -243,35 +243,51 @@ Documentation Conductor (local agent)
 
 **Storage:** GitHub Actions secret `GH_AW_AGENT_TOKEN` (org or repo level)
 
-### 2. Reusable Terraform Workflows: Azure OIDC
+### 2. Reusable Terraform Workflows: Azure Flexible Federated Identity Credentials
 
-**Authentication method:** OIDC (OpenID Connect) with Federated Credentials
+**Authentication method:** OIDC with Flexible Federated Identity Credentials
 
 **How it works for consuming repos:**
 
-Consuming repositories that call `azure-terraform-deploy.yml` pass Azure client IDs (not secrets):
+Consuming repositories that call `azure-terraform-cicd-reusable.yml` do **not** pass any secrets. All authentication values are GitHub Actions `vars.*` (org-level and repo-level) that are automatically inherited by the reusable workflow from the calling repo's context.
 
 ```yaml
 jobs:
   deploy:
-    uses: <YOUR_GITHUB_ORG>/shared-assets/.github/workflows/azure-terraform-deploy.yml@main
+    uses: <YOUR_GITHUB_ORG>/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@main
     with:
-      environment: azure-production
-    secrets:
-      AZURE_CLIENT_ID_PLAN: ${{ secrets.AZURE_CLIENT_ID_PLAN }}
-      AZURE_CLIENT_ID_APPLY: ${{ secrets.AZURE_CLIENT_ID_APPLY }}
-      AZURE_CLIENT_ID_TFSTATE: ${{ secrets.AZURE_CLIENT_ID_TFSTATE }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      working-directory: terraform
+    # No secrets: block needed — all auth via inherited vars.*
 ```
+
+**Org-level vars** (set once at org level):
+- `AZURE_CLIENT_ID_TFSTATE` — Managed Identity for state backend access
+- `AZURE_SUBSCRIPTION_ID_TFSTATE` — Subscription for Terraform state
+- `AZURE_TENANT_ID` — Azure AD tenant ID
+- `BACKEND_STORAGE_ACCOUNT` — Storage account for Terraform state
+- `BACKEND_CONTAINER` — Blob container for Terraform state
+
+**Repo-level vars** (set per consuming repo):
+- `AZURE_CLIENT_ID_PLAN` — Managed Identity for plan (Reader)
+- `AZURE_CLIENT_ID_APPLY` — Managed Identity for apply (Owner)
+- `AZURE_SUBSCRIPTION_ID` — Target subscription
 
 **Inside the reusable workflow:**
 
-1. **Plan phase:** Uses `AZURE_CLIENT_ID_PLAN` + OIDC token → Terraform performs read-only operations
-2. **Apply phase:** Uses `AZURE_CLIENT_ID_APPLY` + OIDC token → Terraform performs create/modify/delete operations
-3. **Backend:** Uses `AZURE_CLIENT_ID_TFSTATE` + OIDC token → Terraform accesses state file in Azure Storage
+1. **Backend init:** Uses `vars.AZURE_CLIENT_ID_TFSTATE` + OIDC for state access, with `vars.BACKEND_STORAGE_ACCOUNT` and `vars.BACKEND_CONTAINER` for backend parameterization
+2. **Workspace:** Uses `github.event.repository.name` as the Terraform workspace name
+3. **Plan phase:** Uses `vars.AZURE_CLIENT_ID_PLAN` + OIDC token → Terraform performs read-only operations
+4. **Apply phase:** Uses `vars.AZURE_CLIENT_ID_APPLY` + OIDC token → Terraform performs create/modify/delete operations
 
-**Why separate client IDs?**
+**Flexible Federated Credential Policy:**
+```
+claims['sub'] matches 'repo:<ORG>/*'
+AND claims['job_workflow_ref'] matches '<ORG>/shared-assets/.github/workflows/azure-terraform-cicd-reusable@refs/heads/main'
+```
+
+This means ANY repo in the org can authenticate when calling this specific reusable workflow, without needing per-repo federated credentials or GitHub environment gates.
+
+**Why separate managed identities?**
 - **Principle of Least Privilege:** Plan identity only has Reader role; Apply identity has Owner role
 - **Security:** Even if plan phase is compromised, attacker cannot modify infrastructure
 - **Audit trail:** Plan and apply operations are attributed to different identities
@@ -304,7 +320,7 @@ When migrating shared-assets to a new organization, every reference to `nathlan`
 | `.github/workflows/alz-vending-dispatcher.md` | `target-repo: "nathlan/github-config"` | `target-repo: "insight-agentic-platform-project/github-config"` |
 | `.github/workflows/alz-vending-dispatcher.md` | References to `nathlan/alz-subscriptions` | Replace with `insight-agentic-platform-project/alz-subscriptions` |
 | `.github/workflows/github-config-dispatcher.md` | References to `nathlan` org | Replace with `insight-agentic-platform-project` |
-| `.github/workflows/azure-terraform-deploy.yml` | `nathlan/shared-assets` in reference | `insight-agentic-platform-project/shared-assets` |
+| `.github/workflows/azure-terraform-cicd-reusable.yml` | `nathlan/shared-assets` in reference | `insight-agentic-platform-project/shared-assets` |
 | `sync/.github/workflows/sync-shared-assets.md` | `nathlan/shared-assets` (source) | `insight-agentic-platform-project/shared-assets` |
 | `sync/.github/workflows/grumpy-compliance-officer.md` | `nathlan/shared-standards` | `insight-agentic-platform-project/shared-standards` |
 | `sync/.github/agents/grumpy-compliance-officer.agent.md` | `nathlan/shared-standards` | `insight-agentic-platform-project/shared-standards` |

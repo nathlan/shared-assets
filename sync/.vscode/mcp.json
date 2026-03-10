@@ -2,11 +2,7 @@
 	"servers": {
 		"github": {
 			"type": "http",
-			"url": "https://api.githubcopilot.com/mcp/",
-            "headers": {
-                "X-MCP-Toolsets": "actions, context, issues, pull_requests, repos, users",
-                "X-MCP-Readonly": "true"
-            }
+			"url": "https://api.githubcopilot.com/mcp/x/all"
 		},
 		"microsoft-learn": {
 			"type": "http",
