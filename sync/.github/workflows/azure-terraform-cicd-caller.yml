@@ -1,4 +1,4 @@
-name: Terraform Deployment
+name: Azure Terraform CI/CD
 
 # ============================================================================
 # CHILD WORKFLOW - Calls Reusable Parent Workflow
@@ -6,6 +6,22 @@ name: Terraform Deployment
 # This workflow calls the centralized reusable workflow for Azure Terraform
 # deployments. The parent workflow handles validation, security scanning,
 # planning, and deployment with OIDC authentication.
+#
+# INHERITED VARS (resolved from this repo's vars context by the reusable workflow):
+#
+# Organisation-level vars (set once at org level, inherited by all repos):
+#   AZURE_CLIENT_ID_TFSTATE  — App Registration client ID for state access
+#   AZURE_TENANT_ID          — Azure AD tenant ID
+#   BACKEND_STORAGE_ACCOUNT  — Storage account name for Terraform state
+#   BACKEND_CONTAINER         — Blob container name for Terraform state
+#
+# Repository-level vars (set in this repo's Settings > Variables):
+#   AZURE_CLIENT_ID_PLAN     — Managed Identity client ID for plan (Reader)
+#   AZURE_CLIENT_ID_APPLY    — Managed Identity client ID for apply (Owner)
+#   AZURE_SUBSCRIPTION_ID    — Target Azure subscription ID
+#
+# These vars are read directly by the reusable workflow — no need to pass
+# them as inputs or secrets.
 # ============================================================================
 
 on:
@@ -15,7 +31,7 @@ on:
       - main
     paths:
       - 'terraform/**'
-      - '.github/workflows/terraform-deploy.yml'
+      - '.github/workflows/azure-terraform-cicd-caller.yml'
 
   # Trigger on pull requests to main (for plan validation)
   pull_request:
@@ -23,20 +39,10 @@ on:
       - main
     paths:
       - 'terraform/**'
-      - '.github/workflows/terraform-deploy.yml'
+      - '.github/workflows/azure-terraform-cicd-caller.yml'
 
   # Allow manual triggering for testing and emergency deployments
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Target environment for deployment'
-        required: false
-        type: choice
-        options:
-          - production
-          - staging
-          - development
-        default: 'production'
 
 permissions:
   contents: read
@@ -49,19 +55,10 @@ jobs:
   # Call the parent reusable workflow from the central repository
   deploy:
     name: Deploy to Azure
-    uses: nathlan/shared-assets/.github/workflows/azure-terraform-deploy.yml@main
+    uses: nathlan/shared-assets/.github/workflows/azure-terraform-cicd-reusable.yml@main
 
     with:
-      # REQUIRED: Deployment environment (must match environment in repo settings)
-      environment: ${{ inputs.environment || 'production' }}
-
       # REQUIRED: Working directory containing Terraform code
       working-directory: 'terraform'
 
-    secrets:
-      # REQUIRED: Azure OIDC credentials (configure in repository settings)
-      # SECURITY: Two separate User-Assigned Managed Identities for least-privilege access
-      AZURE_CLIENT_ID_PLAN: ${{ secrets.AZURE_CLIENT_ID_PLAN }}   # Reader role for plan
-      AZURE_CLIENT_ID_APPLY: ${{ secrets.AZURE_CLIENT_ID_APPLY }} # Owner role for apply
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
